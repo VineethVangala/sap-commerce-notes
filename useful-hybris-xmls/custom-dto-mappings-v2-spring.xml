@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2020 SAP SE or an SAP affiliate company. All rights reserved.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="productSearchPageFieldMapper" parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commerceservices.search.facetdata.ProductSearchPageData"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.search.facetdata.ProductSearchPageWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="results" value="products"/>
+			</map>
+		</property>
+	</bean>
+</beans>

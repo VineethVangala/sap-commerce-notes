@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ Copyright (c) 2021 SAP SE or an SAP affiliate company. All rights reserved.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+    <atomictypes>
+        <atomictype class="java.lang.Integer" extends="java.lang.Number" autocreate="true" generate="false"/>
+        <atomictype class="java.lang.Boolean" extends="java.lang.Object" autocreate="true" generate="false"/>
+        <atomictype class="java.lang.String" extends="java.lang.Object" autocreate="true" generate="false"/>
+        <atomictype class="de.hybris.platform.core.PK" extends="java.lang.Object" autocreate="true" generate="false"/>
+    </atomictypes>
+
+    <collectiontypes>
+        <collectiontype code="MediaCollection" elementtype="Media" autocreate="true" generate="true"/>
+        <collectiontype code="OrderEntryCollection" elementtype="OrderEntry" autocreate="true" generate="false" type="list"/>
+        <collectiontype code="ProductCollection" elementtype="Product" autocreate="true" generate="true"/>
+        <collectiontype code="EntryGroupNumbersList" elementtype="java.lang.Integer" autocreate="true" type="set"/>
+        <collectiontype code="CommentTypes" elementtype="CommentType" autocreate="true" generate="true" type="collection" />
+    </collectiontypes>
+
+    <enumtypes>
+        
+        <!-- Dynamic Enum -->
+        <enumtype code="OrderStatus" autocreate="true" generate="true" dynamic="true">
+            <value code="CREATED"/>
+            <value code="ON_VALIDATION"/>
+            <value code="COMPLETED"/>
+            <value code="CANCELLED"/>
+        </enumtype>
+
+        <!-- Non - dynamic Enum -->
+        <enumtype code="ClassificationAttributeTypeEnum" autocreate="true" generate="true">
+			<value code="string"/>
+			<value code="number"/>
+			<value code="boolean"/>
+			<value code="enum"/>
+			<value code="date"/>
+            <value code="reference"/>
+		</enumtype>
+
+    </enumtypes>
+
+    <maptypes>
+
+        <maptype code="localized:java.lang.String"
+                 argumenttype="Language"
+                 returntype="java.lang.String"
+                 autocreate="true"
+                 generate="false"/>
+        
+        <maptype code="String2StringMapType"
+               argumenttype="java.lang.String"
+               returntype="java.lang.String"
+               autocreate="true"
+               generate="true"/>
+        
+    </maptypes>
+
+    <relations>
+        
+        <!-- Relation = One to Many(Set)  -->
+        <relation code="Catalog2VersionsRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement type="Catalog" qualifier="catalog" cardinality="one">
+				<modifiers read="true" write="false" initial="true" optional="false" search="true" unique="true"/>
+			</sourceElement>
+			<targetElement type="CatalogVersion" qualifier="catalogVersions" cardinality="many" ordered="false" collectiontype="set">
+				<modifiers read="true" write="true" optional="true" search="true" partof="true"/>
+			</targetElement>
+		</relation>
+
+        <!-- Relation = One to Many(ordered list)  -->
+        <relation code="Product2FeatureRelation" autocreate="true" generate="true" localized="false">
+    		<sourceElement qualifier="product" type="Product" cardinality="one">
+    			<modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+    		</sourceElement>
+    		<targetElement qualifier="features" type="ProductFeature" cardinality="many" ordered="true" collectiontype="list">
+    			<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+    			<custom-properties>
+    				<property name="ordering.attribute"><value>"featurePosition"</value></property>
+					<property name="readOnlyForUI"><value>Boolean.TRUE</value></property>
+				</custom-properties>
+    		</targetElement>
+    	</relation>
+        
+        <!-- Relation = Many to Many(ordered list) stored in separate table -->
+        <relation code="CategoryProductRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="Cat2ProdRel" typecode="143"/>
+    		<sourceElement qualifier="supercategories" type="Category" cardinality="many" ordered="false">
+    		    <description>Super Categories</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</sourceElement>
+    		<targetElement qualifier="products" type="Product" cardinality="many" collectiontype="list" ordered="true">
+    		    <description>Products</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</targetElement>		
+    	</relation>
+        
+        <!-- Relation = Many(ordered list) to Many(ordered list)  stored in separate table -->
+        <relation code="CategoryCategoryRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="Cat2CatRel" typecode="144"/>
+    		<sourceElement qualifier="supercategories" type="Category" cardinality="many" collectiontype="list" ordered="true">
+    		    <description>Super Categories</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</sourceElement>
+    		<targetElement qualifier="categories" type="Category" cardinality="many" collectiontype="list" ordered="true">
+    		    <description>Sub Categories</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</targetElement>    		
+    	</relation>
+
+        <relation code="AbstractOrder2AbstractOrderEntry" localized="false" generate="true" autocreate="true">
+            <sourceElement type="AbstractOrder" qualifier="order" cardinality="one">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+                <custom-properties>
+                    <property name="ordering.attribute">
+                        <value>"entryNumber"</value>
+                    </property>
+                </custom-properties>
+            </sourceElement>
+            <targetElement type="AbstractOrderEntry" qualifier="entries" cardinality="many" collectiontype="list" ordered="false">
+                <modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+                <custom-properties>
+                    <property name="query.filter">
+                        <value>"{original} is null"</value>
+                    </property>
+                </custom-properties>
+            </targetElement>
+        </relation>
+        
+        <!-- Relation = Many(set) to Many(set) stored in separate table -->
+        <relation code="PrincipalGroupRelation" autocreate="true" generate="false" localized="false"
+                  deployment="de.hybris.platform.persistence.link.PrincipalGroupRelation">
+            <sourceElement qualifier="members" type="Principal" collectiontype="set" cardinality="many" ordered="false">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </sourceElement>
+            <targetElement qualifier="groups" type="PrincipalGroup" collectiontype="set" cardinality="many"
+                           ordered="false">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </targetElement>
+        </relation>
+        
+        <!-- Relation = Many(ordered list) to one -->
+        <relation code="ReplyParentRelation" autocreate="true" generate="true" localized="false">			
+			<sourceElement qualifier="replies" type="Reply" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers initial="false" read="true" write="true" optional="true" partof="true" />
+			</sourceElement>
+			<targetElement qualifier="parent" type="Reply" cardinality="one">
+				<modifiers initial="true" read="true" write="false" optional="true" />
+			</targetElement>
+		</relation>
+
+        <!-- Relation = Many to one -->
+        <relation code="BaseSite2CartRemovalCronJob" generate="true" localized="false" autocreate="true">
+			<sourceElement type="BaseSite" cardinality="many" qualifier="sites">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement type="CartRemovalCronJob" cardinality="one" qualifier="cartRemovalCronJob">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+
+   </relations>
+
+	<itemtypes>
+        
+        <!-- An new itemtype extending another itemtype -->
+        <itemtype code="ConsignmentProcess" autocreate="true"
+			generate="true" jaloclass="de.hybris.platform.ordersplitting.jalo.ConsignmentProcess"
+			extends="BusinessProcess">
+
+        <!-- An new itemtype extending another itemtype stored in separate table -->
+        <itemtype code="FraudReport" jaloclass="de.hybris.platform.fraud.jalo.FraudReport"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="FraudReports" typecode="2001" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="code">
+					<modifiers read="true" write="false" initial="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="provider">
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="timestamp" type="java.util.Date">
+					<modifiers initial="true" read="true" write="false"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="status" type="FraudStatus">
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="explanation" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+        <!-- An existing itemtype updated with new attribute -->
+        <itemtype code="Product" autocreate="false" generate="false">
+			<attributes>
+			    <attribute autocreate="true" qualifier="variantType" type="VariantType">
+			      <persistence type="property"/>
+			      <modifiers read="true" write="true" search="true" optional="true" initial="false"/>
+			    </attribute>
+			</attributes>
+		</itemtype>
+
+        <!-- An new itemtype created as catalog aware itemtype.
+        It is stored in separate table. It has db indexes configured.  
+        It also has localized and dynamic attributes. -->
+        <itemtype code="Category" generate="true" extends="GenericItem" autocreate="true"
+					jaloclass="de.hybris.platform.category.jalo.Category">
+			<deployment table="Categories" typecode="142"/>
+			<custom-properties>
+				<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+				<property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+				<property name="uniqueKeyAttributeQualifier"><value>"code"</value></property>
+				<property name="catalog.sync.default.root.type"><value>Boolean.TRUE</value></property>		
+				<property name="catalog.sync.default.root.type.order"><value>Integer.valueOf(1)</value></property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<description>Catalog Category Description</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="order" type="java.lang.Integer">
+					<description>Order</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="catalog" type="Catalog">
+					<description>Catalog</description>
+					<modifiers read="true" write="true" initial="true" search="true" optional="false" private="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<description>CatalogVersion</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="normal" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="thumbnails" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<!-- from category-items.xml -->
+				<attribute qualifier="thumbnail" type="Media">
+					<description>Small Image</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>				
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<description>Name</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>				
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Code</description>
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>				
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="allSubcategories" type="CategoryCollection">
+					<modifiers read="true" write="false" search="false" optional="true"/>
+					<persistence type="dynamic" attributeHandler="categoryAllSubcategories"/>
+				</attribute>
+				<attribute qualifier="allSupercategories" type="CategoryCollection">
+					<modifiers read="true" write="false" search="false" optional="true"/>
+					<persistence type="dynamic" attributeHandler="categoryAllSupercategories" />
+				</attribute>
+			</attributes>
+            <indexes>
+            	<index name="codeIDX" unique="false">
+            		<key attribute="code"/>
+            	</index>
+	          	<index name="versionIDX" unique="false">
+            		<key attribute="catalogVersion"/>
+            	</index>
+	          	<index name="codeVersionIDX" unique="true">
+            		<key attribute="code"/>
+            		<key attribute="catalogVersion"/>
+            	</index>    
+            </indexes>
+		</itemtype>
+
+        <!-- An existing itemtype updated. It has attributes of type Double, localized String, Map, Enum etc. -->
+        <itemtype code="Product" autocreate="false" generate="false">
+			<custom-properties>
+				<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+				<property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+				<property name="uniqueKeyAttributeQualifier"><value>"code"</value></property>
+				<property name="catalog.sync.default.root.type"><value>Boolean.TRUE</value></property>
+				<property name="catalog.sync.default.root.type.order"><value>Integer.valueOf(2)</value></property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="catalog" type="Catalog">
+					<modifiers read="true" write="true" search="true" optional="false" private="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="onlineDate" type="java.util.Date">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="manufacturerAID" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="deliveryTime" type="java.lang.Double">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="specialTreatmentClasses" type="String2StringMapType">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="remarks" type="localized:java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true" dontOptimize="true"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="approvalStatus" type="ArticleApprovalStatus">
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<!-- quick hack for setting enum values as default value - this syntax may no be supported in future versions ! -->
+					<defaultvalue>em().getEnumerationValue("ArticleApprovalStatus","check")</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="contentUnit" type="Unit">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="numberContentUnits" type="java.lang.Double">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="minOrderQuantity" type="java.lang.Integer">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="priceQuantity" type="java.lang.Double">
+					<defaultvalue>new Double( 1 )</defaultvalue>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="thumbnails" type="MediaCollection">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="untypedFeatures" type="ProductFeatureCollection">
+					<custom-properties>
+						<property name="readOnlyForUI">
+							<value>Boolean.TRUE</value>
+						</property>
+					</custom-properties>
+					<modifiers read="true" write="true" search="false" optional="true" partof="true"/>
+					<persistence type="dynamic"/>
+				</attribute>
+				<!-- for beeing indexed by lucene search -->
+				<attribute qualifier="classificationIndexString" type="localized:java.lang.String">
+					<custom-properties>
+						<property name="forceLuceneIndexable"><value>Boolean.TRUE</value></property>
+					</custom-properties>
+					<model generate="false"/><!-- switch off access to this attribute in model class; see PLA-7618 -->
+					<modifiers read="true" write="false" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				<attribute qualifier="classificationClasses" type="ClassificationClassList">
+					<modifiers read="true" write="false" optional="true"/>
+					<persistence type="dynamic"/>
+				</attribute>
+			</attributes>
+         <indexes>
+         	<index name="catalogIDX" unique="false">
+         		<key attribute="catalog"/>
+         	</index>
+         	<index name="visibilityIDX" unique="false">
+         		<key attribute="approvalStatus"/>
+         		<key attribute="onlineDate"/>
+         		<key attribute="offlineDate"/>
+         	</index>
+         	<index name="codeVersionIDX" unique="true">
+         		<key attribute="code"/>
+         		<key attribute="catalogVersion"/>
+         	</index>
+	       	<index name="versionIDX" unique="false">
+         		<key attribute="catalogVersion"/>
+         	</index>
+         </indexes>
+		</itemtype>
+
+        <!-- Type group -->
+        <typegroup name="classification">
+
+			<itemtype code="ClassificationSystem" generate="true" extends="Catalog" autocreate="true"
+							jaloclass="de.hybris.platform.catalog.jalo.classification.ClassificationSystem">
+				<attributes>
+					<attribute qualifier="catalogVersions" redeclare="true" type="ClassificationSystemVersionCollection">
+						<description>classification system versions of this catalog</description>
+						<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+						<persistence type="jalo"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="ClassificationSystemVersion"
+							generate="true" extends="CatalogVersion" autocreate="true" 
+							jaloclass="de.hybris.platform.catalog.jalo.classification.ClassificationSystemVersion">
+				<attributes>
+					<attribute qualifier="catalog" type="ClassificationSystem" redeclare="true">
+						<description>the classification system</description>
+						<modifiers read="true" write="false" search="true" optional="false" initial="true" unique="true"/>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+        </typegroup>
+
+	</itemtypes>
+</items>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2020 SAP SE or an SAP affiliate company. All rights reserved.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- TypeAliasMapping -->
+    <bean class="de.hybris.platform.commercefacades.xstream.alias.TypeAliasMapping">
+		<property name="alias" value="product" />
+		<property name="aliasedClass" value="de.hybris.platform.commercefacades.product.data.ProductData" />
+	</bean>
+
+    <!-- AttributeConverterMapping -->
+    <bean class="de.hybris.platform.commercefacades.xstream.conv.AttributeConverterMapping">
+		<property name="aliasedClass" value="de.hybris.platform.commercefacades.product.data.ProductData" />
+		<property name="converter">
+			<bean class="de.hybris.platform.commercewebservices.core.conv.StringValueConverter">
+				<property name="limit" value="500" />
+			</bean>
+		</property>
+		<property name="attributeName" value="description" />
+	</bean>
+
+    <bean class="de.hybris.platform.commercefacades.xstream.conv.AttributeConverterMapping">
+		<property name="aliasedClass" value="de.hybris.platform.commerceservices.search.facetdata.FacetData" />
+		<property name="converter">
+			<bean class="de.hybris.platform.commercewebservices.core.conv.FacetValueDataListConverter">
+			</bean>
+		</property>
+		<property name="attributeName" value="values" />
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.xstream.conv.AttributeConverterMapping">
+		<property name="aliasedClass" value="de.hybris.platform.commerceservices.search.facetdata.FacetData" />
+		<property name="converter">
+			<bean class="de.hybris.platform.commercewebservices.core.conv.FacetValueDataListConverter">
+			</bean>
+		</property>
+		<property name="attributeName" value="topValues" />
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.xstream.conv.AttributeConverterMapping">
+		<property name="aliasedClass" value="de.hybris.platform.commerceservices.search.facetdata.ProductSearchPageData" />
+		<property name="converter">
+			<bean class="de.hybris.platform.commercewebservices.core.conv.SpellingSuggestionDataConverter">
+			</bean>
+		</property>
+		<property name="attributeName" value="spellingSuggestion" />
+	</bean>
+
+    <!-- FieldAliasMapping -->
+    <bean class="de.hybris.platform.commercefacades.xstream.alias.FieldAliasMapping">
+		<property name="alias" value="products" />
+		<property name="fieldName" value="results" />
+		<property name="aliasedClass" value="de.hybris.platform.commerceservices.search.facetdata.ProductSearchPageData" />
+	</bean>
+
+    <!-- AttributeOmitMapping -->
+    <bean class="de.hybris.platform.commercefacades.xstream.alias.AttributeOmitMapping">
+		<property name="attributeName" value="supercategories" />
+		<property name="aliasedClass" value="de.hybris.platform.commercefacades.product.data.CategoryData" />
+	</bean>
+
+    <!-- ImplicitCollection -->
+    <bean class="de.hybris.platform.commercefacades.xstream.alias.ImplicitCollection">
+		<property name="ownerType" value="de.hybris.platform.commercefacades.product.data.ProductReferencesData" />
+		<property name="fieldName" value="references" />
+	</bean>
+
+</beans>

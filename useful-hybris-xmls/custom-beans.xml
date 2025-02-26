@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<!-- Add accelerator facades specific product options -->
+	<enum class="de.hybris.platform.commercefacades.product.ProductOption">
+		<value>PRICE_RANGE</value>
+		<value>KEYWORDS</value>
+	</enum>
+
+    <bean class="de.hybris.platform.commercefacades.product.data.ProductData">
+        <property name="code" type="String" />
+		<property name="name" type="java.util.Map&lt;String,String>" />
+		<property name="description" type="java.util.Map&lt;String,String>" />
+		<property name="keywords" type="java.util.Set&lt;java.lang.String>"/>
+        <property name="purchasable" type="Boolean"/>
+        <property name="multidimensional" type="Boolean"/>
+        <property name="configurable" type="Boolean"/>
+        <property name="price" type="PriceData"/>
+        <property name="images"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.product.data.ImageData>"/>
+		<property name="categories"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.product.data.CategoryData>"/>
+        <property name="tags" type="java.util.Set&lt;String>"/>
+        <property name="orderFormQuantity" type="java.lang.Integer"/>
+
+	</bean>
+
+    <bean class="de.hybris.platform.commercewebservices.core.storesession.data.LanguageDataList">
+		<property name="languages"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.storesession.data.LanguageData>"/>
+	</bean>
+
+    <bean class="de.hybris.platform.commerceservices.search.facetdata.ProductCategorySearchPageData&lt;STATE, RESULT, CATEGORY>"
+        extends="de.hybris.platform.commerceservices.search.facetdata.ProductSearchPageData&lt;STATE, RESULT>">
+		<description>POJO containing the result page for product or category search.</description>
+		<property name="subCategories" type="java.util.List&lt;CATEGORY>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.facetdata.ProductSearchPageData&lt;STATE, RESULT>"
+        extends="de.hybris.platform.commerceservices.search.facetdata.FacetSearchPageData&lt;STATE, RESULT>">
+		<description>POJO containing the result page for product search.</description>
+		<property name="freeTextSearch" type="String"/>
+		<property name="categoryCode" type="String"/>
+		<property name="keywordRedirectUrl" type="String"/>
+		<property name="spellingSuggestion" type="de.hybris.platform.commerceservices.search.facetdata.SpellingSuggestionData&lt;STATE>"/>
+	</bean>
+
+    <bean class="de.hybris.platform.commerceservices.search.facetdata.FacetSearchPageData&lt;STATE, RESULT>" 
+        extends="de.hybris.platform.commerceservices.search.pagedata.SearchPageData&lt;RESULT>">
+		<description>POJO that includes all necessary data for creating proper result in facet search.</description>
+		<property name="currentQuery" type="STATE"/>
+		<property name="breadcrumbs" type="java.util.List&lt;de.hybris.platform.commerceservices.search.facetdata.BreadcrumbData&lt;STATE>>"/>
+		<property name="facets" type="java.util.List&lt;de.hybris.platform.commerceservices.search.facetdata.FacetData&lt;STATE>>"/>
+	</bean>
+
+
+
+    <bean class="de.hybris.platform.commerceservices.search.resultdata.SearchResultValueData">
+		<property name="values" type="java.util.Map&lt;String, Object>"/>
+		<property name="featureValues" type="java.util.Map&lt;de.hybris.platform.catalog.model.classification.ClassAttributeAssignmentModel, Object>"/>
+		<property name="variants" type="java.util.Collection&lt;de.hybris.platform.commerceservices.search.resultdata.SearchResultValueData>"/>
+		<property name="tags" type="java.util.Set&lt;String>"/>
+	</bean>
+
+    <bean class="de.hybris.platform.commerceservices.store.data.GeoPoint">
+		<property name="latitude" type="double"/>
+		<property name="longitude" type="double"/>
+	</bean>
+
+    <!-- Web Services WsDTO -->
+    <bean class="de.hybris.platform.commercewebservicescommons.dto.product.ProductWsDTO">
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">Product</hint>
+        </hints>
+        <property name="code" type="String"/>
+        <property name="name" type="String"/>
+        <property name="url" type="String"/>
+        <property name="description" type="String"/>
+        <property name="purchasable" type="Boolean"/>
+        <property name="stock" type="de.hybris.platform.commercewebservicescommons.dto.product.StockWsDTO"/>
+        <property name="futureStocks"
+                  type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.FutureStockWsDTO>"/>
+        <property name="availableForPickup" type="java.lang.Boolean"/>
+        <property name="averageRating" type="Double"/>
+        <property name="numberOfReviews" type="Integer"/>
+        <property name="summary" type="String"/>
+        <property name="manufacturer" type="String"/>
+        <property name="variantType" type="String"/>
+        <property name="price" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+        <property name="baseProduct" type="String"/>
+        <property name="images"
+                  type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.ImageWsDTO>"/>
+        <property name="categories"
+                  type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.CategoryWsDTO>"/>
+        <property name="reviews"
+                  type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.ReviewWsDTO>"/>
+        <property name="classifications"
+                  type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.ClassificationWsDTO>"/>
+        <property name="potentialPromotions"
+                  type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.PromotionWsDTO>"/>
+        <property name="variantOptions"
+                  type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.VariantOptionWsDTO>"/>
+        <property name="baseOptions"
+                  type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.BaseOptionWsDTO>"/>
+        <property name="volumePricesFlag" type="Boolean"/>
+        <property name="volumePrices"
+                  type="List&lt;de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO>"/>
+        <property name="productReferences"
+                  type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.ProductReferenceWsDTO>"/>
+        <property name="variantMatrix"
+                  type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.VariantMatrixElementWsDTO>"/>
+        <property name="priceRange" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceRangeWsDTO"/>
+        <property name="multidimensional" type="Boolean"/>
+        <property name="configuratorType" type="String"/>
+        <property name="configurable" type="Boolean"/>
+        <property name="tags" type="java.util.Set&lt;String>"/>
+    </bean>
+
+    <bean class="de.hybris.platform.commercewebservicescommons.dto.search.facetdata.ProductSearchPageWsDTO">
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">ProductSearchPage</hint>
+        </hints>
+        <property name="freeTextSearch" type="String"/>
+        <property name="categoryCode" type="String"/>
+        <property name="keywordRedirectUrl" type="String"/>
+        <property name="spellingSuggestion"
+                  type="de.hybris.platform.commercewebservicescommons.dto.search.facetdata.SpellingSuggestionWsDTO"/>
+        <property name="products"
+                  type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.ProductWsDTO>"/>
+        <property name="sorts"
+                  type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.pagedata.SortWsDTO>"/>
+        <property name="pagination"
+                  type="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PaginationWsDTO"/>
+        <property name="currentQuery" type="de.hybris.platform.commercewebservicescommons.dto.search.SearchStateWsDTO"/>
+        <property name="breadcrumbs"
+                  type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.facetdata.BreadcrumbWsDTO>"/>
+        <property name="facets"
+                  type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.facetdata.FacetWsDTO>"/>
+    </bean>
+
+</beans>

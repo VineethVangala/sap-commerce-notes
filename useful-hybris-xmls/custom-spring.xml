@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+    
+    <!-- Import the mock payment service (which is configured as the default) -->
+    <import resource="/commerceservices/mock-payment-spring.xml"/>
+    <import resource="commerceservices-spring-solrfacetsearch.xml"/>
+
+    <!-- Sample Bean Creation -->
+	<bean id="apparelStoreSystemSetup" class="de.hybris.platform.apparelstore.setup.ApparelStoreSystemSetup" parent="abstractCoreSystemSetup">
+		<property name="coreDataImportService" ref="coreDataImportService"/>
+		<property name="sampleDataImportService" ref="sampleDataImportService"/>
+	</bean>
+
+    <!-- Sample Converter Bean Creation with populators list -->
+    <alias name="defaultCommerceSolrSearchResponseConverter" alias="commerceSolrSearchResponseConverter" />
+	<bean id="defaultCommerceSolrSearchResponseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commerceservices.search.facetdata.ProductCategorySearchPageData" />
+		<property name="populators">
+			<list>
+				<ref bean="commerceSearchResponseQueryPopulator" />
+				<ref bean="commerceSearchResponsePaginationPopulator" />
+				<ref bean="commerceSearchResponseResultsPopulator" />
+				<ref bean="commerceSearchResponseFacetsPopulator" />
+				<ref bean="commerceSearchResponseFacetFilterPopulator" />
+				<ref bean="commerceSearchResponseBreadcrumbsPopulator" />
+				<ref bean="commerceSearchResponseSortsPopulator" />
+				<ref bean="commerceSearchResponseFreeTextSearchPopulator" />
+				<ref bean="commerceSearchResponseCategoryCodePopulator" />
+				<ref bean="commerceSearchResponseSubCategoriesPopulator" />
+				<ref bean="commerceSearchResponseSpellingSuggestionPopulator" />
+				<ref bean="commerceSearchResponseKeywordRedirectPopulator" />
+			</list>
+		</property>
+	</bean>
+    
+    <!-- Sample Bean overriding using Alias -->
+    <alias name="defaultCommerceSearchResponseQueryPopulator" alias="commerceSearchResponseQueryPopulator" />
+	<bean id="defaultCommerceSearchResponseQueryPopulator" class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseQueryPopulator" />
+	
+    <!-- Sample Bean with property of type list -->
+    <alias name="defaultCommerceSearchTextPopulator" alias="commerceSearchTextPopulator" />
+	<bean id="defaultCommerceSearchTextPopulator" class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchTextPopulator">
+		<property name="freeTextQueryBuilders">
+			<list>
+				<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.DefaultFreeTextQueryBuilder">
+					<property name="propertyName" value="ean" />
+					<property name="boost" value="100" />
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.DefaultFreeTextQueryBuilder">
+					<property name="propertyName" value="code" />
+					<property name="boost" value="90" />
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.DefaultFreeTextQueryBuilder">
+					<property name="propertyName" value="name" />
+					<property name="boost" value="50" />
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.DefaultFreeTextQueryBuilder">
+					<property name="propertyName" value="manufacturerName" />
+					<property name="boost" value="40" />
+				</bean>
+				<bean
+					class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.ClassificationFreeTextQueryBuilder">
+					<property name="boost" value="30" />
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.DefaultFreeTextQueryBuilder">
+					<property name="propertyName" value="keywords" />
+					<property name="boost" value="20" />
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.DefaultFreeTextQueryBuilder">
+					<property name="propertyName" value="categoryName" />
+					<property name="boost" value="10" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+    <!-- Sample Converter Bean populator addition-->
+    <alias name="commerceIndexedPropertyConverter" alias="indexedPropertyConverter" />
+	<bean id="commerceIndexedPropertyConverter" parent="defaultIndexedPropertyConverter">
+		<property name="populators">
+			<list merge="true">
+				<ref bean="commerceIndexedPropertyPopulator" />
+			</list>
+		</property>
+	</bean>
+
+    <!-- Sample Bean with map property-->
+    <alias name="defaultCommerceSearchResponseKeywordRedirectPopulator" alias="commerceSearchResponseKeywordRedirectPopulator" />
+	<bean id="defaultCommerceSearchResponseKeywordRedirectPopulator"
+		class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseKeywordRedirectPopulator">
+		<property name="typeService" ref="typeService" />
+		<property name="keywordRedirectUrlResolvers">
+			<map>
+				<entry key="SolrProductRedirect" value-ref="productKeywordRedirectUrlResolver" />
+				<entry key="SolrCategoryRedirect" value-ref="categoryKeywordRedirectUrlResolver" />
+				<entry key="SolrURIRedirect" value-ref="uriKeywordRedirectUrlResolver" />
+			</map>
+		</property>
+	</bean>
+
+    <alias name="defaultBuyerQuoteActionStateTransitionMap" alias="buyerQuoteActionStateTransitionMap"/>
+    <util:map id="defaultBuyerQuoteActionStateTransitionMap" key-type="de.hybris.platform.commerceservices.enums.QuoteAction"
+              value-type="de.hybris.platform.core.enums.QuoteState">
+        <entry key="CREATE" value="BUYER_DRAFT"/>
+        <entry key="EDIT" value="BUYER_DRAFT"/>
+        <entry key="SUBMIT" value="BUYER_SUBMITTED"/>
+        <entry key="ORDER" value="BUYER_ORDERED"/>
+        <entry key="CANCEL" value="CANCELLED"/>
+        <entry key="EXPIRED" value="EXPIRED"/>
+    </util:map>
+
+    <!-- Sample bean with map of value type set property   -->
+    <alias name="defaultBuyerQuoteActionAllowedStateMap" alias="buyerQuoteActionAllowedStateMap"/>
+    <util:map id="defaultBuyerQuoteActionAllowedStateMap" key-type="de.hybris.platform.commerceservices.enums.QuoteAction"
+              value-type="java.util.Set&lt;de.hybris.platform.core.enums.QuoteState>">
+        <entry key="VIEW">
+            <set value-type="de.hybris.platform.core.enums.QuoteState">
+                <value>BUYER_DRAFT</value>
+                <value>BUYER_SUBMITTED</value>
+                <value>BUYER_OFFER</value>
+                <value>BUYER_ACCEPTED</value>
+                <value>BUYER_REJECTED</value>
+                <value>BUYER_APPROVED</value>
+                <value>BUYER_ORDERED</value>
+                <value>CANCELLED</value>
+                <value>EXPIRED</value>
+            </set>
+        </entry>
+        <entry key="EDIT">
+            <set value-type="de.hybris.platform.core.enums.QuoteState">
+                <value>BUYER_DRAFT</value>
+                <value>BUYER_OFFER</value>
+                <value>EXPIRED</value>
+            </set>
+        </entry>
+        <entry key="SAVE">
+            <set value-type="de.hybris.platform.core.enums.QuoteState">
+                <value>BUYER_DRAFT</value>
+            </set>
+        </entry>
+        <entry key="SUBMIT">
+            <set value-type="de.hybris.platform.core.enums.QuoteState">
+                <value>BUYER_DRAFT</value>
+            </set>
+        </entry>
+        <entry key="CANCEL">
+            <set value-type="de.hybris.platform.core.enums.QuoteState">
+                <value>BUYER_DRAFT</value>
+                <value>BUYER_OFFER</value>
+                <value>EXPIRED</value>
+            </set>
+        </entry>
+        <entry key="CHECKOUT">
+            <set value-type="de.hybris.platform.core.enums.QuoteState">
+                <value>BUYER_OFFER</value>
+            </set>
+        </entry>
+        <entry key="REQUOTE">
+            <set value-type="de.hybris.platform.core.enums.QuoteState">
+                <value>CANCELLED</value>
+                <value>EXPIRED</value>
+                <value>ORDERED</value>
+                <value>BUYER_ORDERED</value>
+            </set>
+        </entry>
+    </util:map>
+
+    <!-- Sample Bean using configuration property-->
+    <alias alias="secureTokenService" name="defaultSecureTokenService"/>
+    <bean id="defaultSecureTokenService"
+          class="de.hybris.platform.commerceservices.security.impl.DefaultSecureTokenService">
+        <property name="signatureKeyHex"
+                  value="#{configurationService.configuration.getProperty('commerceservices.securetoken.signature-key')}"/>
+        <property name="encryptionKeyHex"
+                  value="#{configurationService.configuration.getProperty('commerceservices.securetoken.encryption-key')}"/>
+    </bean>
+
+    <!-- Sample bean of type list -->
+    <util:list id="commerceQuoteValidatorList"
+      value-type="de.hybris.platform.commerceservices.order.hook.CommerceQuoteValidator" />
+
+    <util:list id="productCategoryBlacklist" value-type="java.lang.Class">
+        <value>de.hybris.platform.catalog.model.classification.ClassificationClassModel</value>
+        <value>de.hybris.platform.variants.model.VariantCategoryModel</value>
+        <value>de.hybris.platform.variants.model.VariantValueCategoryModel</value>
+        <value>de.hybris.platform.category.model.ConfigurationCategoryModel</value>
+    </util:list>
+
+    <!-- Sample bean with scope = prototype  -->
+    <bean id="paginationData" class="de.hybris.platform.commerceservices.search.pagedata.PaginationData"
+          scope="prototype"/>
+
+    <!-- Sample bean with constructor args  -->
+    <alias name="defaultBruteForceAttackHandler" alias="bruteForceAttackHandler"/>
+    <bean id="defaultBruteForceAttackHandler" class="de.hybris.platform.commerceservices.security.impl.DefaultBruteForceAttackHandler">
+        <constructor-arg name="maxAttempts" value="#{configurationService.configuration.getProperty('commerceservices.bruteForceAttackHandler.maxAttempts')}"/>
+        <constructor-arg name="waitTime" value="#{configurationService.configuration.getProperty('commerceservices.bruteForceAttackHandler.waitTime')}"/>
+        <constructor-arg name="timeFrame" value="#{configurationService.configuration.getProperty('commerceservices.bruteForceAttackHandler.timeFrame')}"/>
+        <constructor-arg name="cacheSizeLimit" value="1000" />
+    </bean>
+
+    <!-- Abstract bean used as a parent for beans that modify a ModifiableConfigurablePopulator. -->
+    <bean id="configurablePopulatorModification" class="de.hybris.platform.commercefacades.converter.config.ConfigurablePopulatorModification"
+          abstract="true" init-method="initialize"/>
+    
+    <!-- Sample bean addition into list -->
+    <bean id="priceProcessorsMergeDirective" depends-on="defaultPriceProcessors" parent="listMergeDirective" >
+        <property name="add" ref="findPriceValuesStrategyProcessor" />           
+    </bean>
+
+    <!-- Sample populator addition into converter  -->
+    <bean name="sapProductConfigModifyQuotePopulatorList" parent="modifyPopulatorList">
+		<property name="list" ref="quoteConverter" />
+		<property name="add" ref="sapProductConfigQuotePopulator" />
+	</bean>
+    
+    <!-- Sample populator removal from covnerter  -->
+    <bean name="sapProductConfigModifySavedCartPopulatorList" parent="modifyPopulatorList">
+		<property name="list" ref="savedCartConverter" />
+		<property name="remove" ref="sapProductConfigCartPopulator" />
+	</bean>
+
+</beans>
