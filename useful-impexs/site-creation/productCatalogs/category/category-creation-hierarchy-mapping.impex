@@ -1,0 +1,50 @@
+$productCatalog=electronicsProductCatalog
+$productCatalogName=Electronics Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$supercategories=source(code, $catalogVersion)[unique=true]
+$categories=target(code, $catalogVersion)[unique=true]
+
+INSERT_UPDATE Category;code[unique=true];allowedPrincipals(uid)[default='customergroup'];$catalogVersion
+ ;1
+ ;106
+
+UPDATE Category;code[unique=true];$catalogVersion;name[lang=$lang]
+ ;1;;Open Catalogue;
+ ;106;;Components;
+ ;206;;Data storage;
+
+UPDATE Category;code[unique=true];$catalogVersion;name[lang=$lang2]
+ ;1;;Open Catalogue;
+ ;106;;Components;
+ ;206;;Data storage;
+ 
+INSERT_UPDATE CategoryCategoryRelation;$categories;$supercategories
+ ;106;1
+ ;206;1
+
+$catalogVersion=catalogVersion(catalog(id[default='apparelProductCatalog']),version[default='Staged'])[unique=true,default='apparelProductCatalog:Staged']
+$categories=target(code, $catalogVersion)[unique=true]
+$supercategories=source(code, $catalogVersion)[unique=true]
+$lang=en
+
+INSERT_UPDATE Category;code[unique=true];$catalogVersion;supercategories(code,$catalogVersion);allowedPrincipals(uid)[default='customergroup']
+;categories;;
+;collections;;
+;surf;;collections
+
+INSERT_UPDATE Category;code[unique=true];$catalogVersion;allowedPrincipals(uid)[default='customergroup']
+;210100;;;
+;210000;;;
+
+INSERT_UPDATE CategoryCategoryRelation;$categories;$supercategories
+;210000;categories;
+;210100;210000;
+;210100;surf;
+
+UPDATE Category;code[unique=true];$catalogVersion;name[lang=$lang];description[lang=$lang]
+;210000;;Eyewear;
+;210100;;Shades;
+;categories;;Categories;
+;collections;;Collections;
+;sunglasses;;Sunglasses;
+;surf;;Surf;

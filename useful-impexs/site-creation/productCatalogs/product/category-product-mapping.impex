@@ -1,0 +1,20 @@
+$productCatalog=apparelProductCatalog
+$productCatalogName=Apparel Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$baseProduct=baseProduct(code, catalogVersion(catalog(id[default='$productCatalog']),version[default='Staged']))
+
+$categories=source(code, $catalogVersion)[unique=true]
+$products=target(code, $catalogVersion)[unique=true]
+
+INSERT_UPDATE CategoryProductRelation;$categories;$products
+# MENS SHADES
+;210100;300044617
+;210100;300044623
+;210100;300044624
+
+UPDATE ApparelStyleVariantProduct;code[unique=true];$catalogVersion;swatchColors(code)
+;M35392;;BLACK
+;M33477;;BLACK
+;M28324;;WHITE
+;M27160;;BLACK,GREY
+;M18729;;BLACK,RED

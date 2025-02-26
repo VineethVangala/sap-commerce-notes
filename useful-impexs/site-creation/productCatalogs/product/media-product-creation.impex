@@ -1,0 +1,51 @@
+$productCatalog=apparelProductCatalog
+$productCatalogName=Apparel Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$media=@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator]
+$siteResource=jar:de.hybris.platform.apparelstore.constants.ApparelstoreConstants&/apparelstore/import/sampledata/productCatalogs/$productCatalog
+$thumbnail=thumbnail(code, $catalogVersion)
+$picture=picture(code, $catalogVersion)
+$thumbnails=thumbnails(code, $catalogVersion)
+$detail=detail(code, $catalogVersion)
+$normal=normal(code, $catalogVersion)
+$others=others(code, $catalogVersion)
+$medias=medias(code, $catalogVersion)
+$galleryImages=galleryImages(qualifier, $catalogVersion)
+
+# Media Folders
+INSERT_UPDATE MediaFolder;qualifier[unique=true];path[unique=true]
+;images;images
+
+# Media formats
+INSERT_UPDATE MediaFormat;qualifier[unique=true]
+;1200Wx1200H
+;515Wx515H
+;365Wx246H
+;300Wx300H
+;96Wx96H
+;65Wx65H
+;30Wx30H
+
+UPDATE MediaFormat;qualifier[unique=true];name[lang=$lang];
+ ;1200Wx1200H;"1200Wx1200H"
+ ;300Wx300H;"300Wx300H"
+ ;30Wx30H;"30Wx30H"
+ ;365Wx246H;"365Wx246H"
+ ;515Wx515H;"515Wx515H"
+ ;65Wx65H;"65Wx65H"
+ ;96Wx96H;"96Wx96H"
+
+# Create medias
+INSERT_UPDATE Media;mediaFormat(qualifier);;code[unique=true];$media;mime[default='image/jpeg'];$catalogVersion;folder(qualifier)
+;1200Wx1200H;29531;/1200Wx1200H/29531_1.jpg;$siteResource/images/1200Wx1200H/29531_1.jpg;;;images
+;515Wx515H;29531;/515Wx515H/29531_1.jpg;$siteResource/images/515Wx515H/29531_1.jpg;;;images
+;300Wx300H;29531;/300Wx300H/29531_1.jpg;$siteResource/images/300Wx300H/29531_1.jpg;;;images
+;96Wx96H;29531;/96Wx96H/29531_1.jpg;$siteResource/images/96Wx96H/29531_1.jpg;;;images
+;65Wx65H;29531;/65Wx65H/29531_1.jpg;$siteResource/images/65Wx65H/29531_1.jpg;;;images
+;30Wx30H;29531;/30Wx30H/29531_1.jpg;$siteResource/images/30Wx30H/29531_1.jpg;;;images
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$catalogVersion
+;29531_1;/1200Wx1200H/29531_1.jpg,/515Wx515H/29531_1.jpg,/300Wx300H/29531_1.jpg,/96Wx96H/29531_1.jpg,/65Wx65H/29531_1.jpg,/30Wx30H/29531_1.jpg;
+
+UPDATE ApparelProduct;code[unique=true];$picture;$thumbnail;$others;$normal;$thumbnails;$catalogVersion;$galleryImages
+;29531;/300Wx300H/29531_1.jpg;/96Wx96H/29531_1.jpg;/1200Wx1200H/29531_1.jpg,/515Wx515H/29531_1.jpg,/300Wx300H/29531_1.jpg,/96Wx96H/29531_1.jpg,/65Wx65H/29531_1.jpg,/30Wx30H/29531_1.jpg;/300Wx300H/29531_1.jpg;/96Wx96H/29531_1.jpg;;29531_1

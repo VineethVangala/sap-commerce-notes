@@ -1,0 +1,39 @@
+$productCatalog=apparelProductCatalog
+$productCatalogName=Apparel Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$baseProduct=baseProduct(code, catalogVersion(catalog(id[default='$productCatalog']),version[default='Staged']))
+$approved=approvalstatus(code)[default='approved']
+$taxGroup=Europe1PriceFactory_PTG(code)[default=eu-vat-full]
+$lang=en
+
+INSERT_UPDATE ApparelProduct;code[unique=true];$catalogVersion;unit(code);supercategories(code,$catalogVersion);varianttype(code);$approved;$taxGroup;ean;genders(code)
+;300044617;;pieces;Anon,sunglasses;;;;225522251;MALE
+;300044623;;pieces;Anon,sunglasses;;;;651338417;MALE
+;300044624;;pieces;Anon,sunglasses;;;;475330206;MALE
+;M25687;;pieces;Playboard,shirts;ApparelStyleVariantProduct;;;;FEMALE 
+
+UPDATE Product;code[unique=true];$catalogVersion;name[lang=$lang];summary[lang=$lang];description[lang=$lang];ApparelStyleVariantProduct.style[lang=$lang];ApparelSizeVariantProduct.size[lang=$lang]
+;300044617;;Shades Anon Convict black fade grey gradient;Anon Convict sunglasses in a black fade frame with grey gradient lenses. The Convict offers a medium fit with medium coverage.;;;;;
+;300044623;;Shades Anon Legion crystal & black grey;Anon Legion Sunglasses in a plaid style.;;;;;
+;300044624;;Shades Anon Allie brown tortoise brown;Anon built the Allie Sunglasses to last. They combined stainless steel hinges durable acetate frames and scratch-resistant lenses to ensure they can take hard use.;;;;;
+;M25687;;T-Shirt Men Playboard Skull SS;T shirt with playboard skull logo on chest;;;;;
+
+INSERT_UPDATE ApparelStyleVariantProduct;code[unique=true];$catalogVersion;$baseProduct;unit(code);swatchColors(code);supercategories(code,$catalogVersion);varianttype(code);$approved
+;M25687_B;;M25687;pieces;BLACK;Playboard,shirts;ApparelSizeVariantProduct
+;M25687_W;;M25687;pieces;WHITE;Playboard,shirts;ApparelSizeVariantProduct
+
+UPDATE Product;code[unique=true];$catalogVersion;name[lang=$lang];summary[lang=$lang];description[lang=$lang];ApparelStyleVariantProduct.style[lang=$lang];ApparelSizeVariantProduct.size[lang=$lang]
+;M25687_B;;T-Shirt Men Playboard Skull SS;T shirt with playboard skull logo on chest in black;;black;;;
+;M25687_W;;T-Shirt Men Playboard Skull SS;T shirt with playboard skull logo on chest in white;;white;;;
+
+INSERT_UPDATE ApparelSizeVariantProduct;code[unique=true];$catalogVersion;$baseProduct;ean;unit(code);swatchColors(code);supercategories(code,$catalogVersion);;$approved;$taxGroup
+;300147490;;M25687_B;4260125824707;pieces;BLACK;Playboard,shirts
+;300147493;;M25687_B;4260203210132;pieces;BLACK;Playboard,shirts
+;300147503;;M25687_W;4260125824639;pieces;WHITE;Playboard,shirts
+;300147505;;M25687_W;4260203210118;pieces;WHITE;Playboard,shirts
+
+UPDATE Product;code[unique=true];$catalogVersion;name[lang=$lang];summary[lang=$lang];description[lang=$lang];ApparelStyleVariantProduct.style[lang=$lang];ApparelSizeVariantProduct.size[lang=$lang]
+;300147490;;T-Shirt Men Playboard Skull SS black S;T shirt with playboard skull logo on chest;;black;S ;;
+;300147493;;T-Shirt Men Playboard Skull SS black XXL;T shirt with playboard skull logo on chest;;black;XXL ;;
+;300147503;;T-Shirt Men Playboard Skull SS white XL;T shirt with playboard skull logo on chest;;white;XL ;;
+;300147505;;T-Shirt Men Playboard Skull SS white XXL;T shirt with playboard skull logo on chest;;white;XXL ;;

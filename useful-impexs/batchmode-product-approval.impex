@@ -1,0 +1,4 @@
+#This impex is useful to bulk approve products
+
+UPDATE Product[batchmode=true]; itemtype(code)[unique=true]; approvalStatus(code)
+;Product;approved

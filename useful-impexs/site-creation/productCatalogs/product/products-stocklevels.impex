@@ -1,0 +1,63 @@
+$productCatalog=apparelProductCatalog
+$productCatalogName=Apparel Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$vendor=apparello
+$lang=en
+
+
+# Create some Warehouses for the Vendor
+INSERT_UPDATE Warehouse;code[unique=true];vendor(code)[forceWrite=true];default[default='true']
+"#% beforeEach:
+import de.hybris.platform.core.Registry;
+import de.hybris.platform.ordersplitting.model.WarehouseModel;
+String warehouseCode = line.get(Integer.valueOf(1));
+WarehouseModel warehouse;
+try
+{
+    warehouse = Registry.getApplicationContext().getBean(""warehouseService"").getWarehouseForCode(warehouseCode);
+}
+catch (Exception e)
+{
+    warehouse = null;
+}
+if (warehouse != null)
+{
+    line.clear();
+}"
+;ap_us_warehouse_s;apparello
+;ap_us_warehouse_e;apparello
+;ap_us_warehouse_w;apparello
+;ap_us_warehouse_n;apparello
+;default;Default Warehouse;
+;ap_warehouse_s;Apparel Warehouse South;apparello
+;ap_warehouse_e;Apparel Warehouse East;apparello
+;ap_warehouse_w;Apparel Warehouse West;apparello
+;ap_warehouse_n;Apparel Warehouse North;apparello
+
+
+# Create Vendor for Apparel Store
+UPDATE Vendor;code[unique=true];name[lang=$lang]
+ ;apparello;Apparello;
+
+# Create some Warehouses for the Vendor
+UPDATE Warehouse;code[unique=true];name[lang=$lang]
+ ;ap_us_warehouse_e;Warehouse US East;
+ ;ap_us_warehouse_n;Warehouse US North;
+ ;ap_us_warehouse_s;Warehouse US South;
+ ;ap_us_warehouse_w;Warehouse US West;
+ ;ap_warehouse_e;Warehouse East;
+ ;ap_warehouse_n;Warehouse North;
+ ;ap_warehouse_s;Warehouse South;
+ ;ap_warehouse_w;Warehouse West;
+
+INSERT_UPDATE StockLevel;available[unique=true];warehouse(code)[unique=true];inStockStatus(code);maxPreOrder;maxStockLevelHistoryCount;overSelling;preOrder;productCode[unique=true];reserved
+;45;ap_warehouse_n;notSpecified;1;0;0;0;300044617;28
+;45;ap_us_warehouse_n;notSpecified;1;0;0;0;300044617;28
+;29;ap_warehouse_s;notSpecified;1;0;0;0;300147490;0
+;31;ap_warehouse_e;notSpecified;1;0;0;0;300147493;0
+;36;ap_warehouse_w;notSpecified;1;0;0;0;300147503;0
+;45;ap_warehouse_n;notSpecified;1;0;0;0;300147505;0
+;29;ap_us_warehouse_s;notSpecified;1;0;0;0;300147490;0
+;31;ap_us_warehouse_e;notSpecified;1;0;0;0;300147493;0
+;36;ap_us_warehouse_w;notSpecified;1;0;0;0;300147503;0
+;45;ap_us_warehouse_n;notSpecified;1;0;0;0;300147505;0

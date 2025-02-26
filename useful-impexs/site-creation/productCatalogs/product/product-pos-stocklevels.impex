@@ -1,0 +1,25 @@
+$productCatalog=apparelProductCatalog
+$productCatalogName=Apparel Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$vendor=apparello
+$lang=en
+
+# Create some Warehouses for the Vendor
+INSERT_UPDATE Warehouse;code[unique=true];vendor(code)[default=$vendor];default[default='false']
+;Birmingham Kathedrale
+
+# Create some Warehouses for the Vendor
+UPDATE Warehouse;code[unique=true];name[lang=$lang]
+ ;Birmingham Kathedrale;Birmingham Kathedrale;
+
+INSERT_UPDATE StockLevel;available;warehouse(code)[default='Birmingham Kathedrale',unique=true];inStockStatus(code)[default='notSpecified'];overSelling;preOrder;productCode[unique=true];reserved
+;4;;;0;0;300044617;0
+;10;;;0;0;300044623;0
+;6;;;0;0;300044624;0
+;12;;;0;0;M25687;0
+;8;;;0;0;M25687_B;0
+;8;;;0;0;M25687_W;0
+;4;;;0;0;300147490;0
+;10;;;0;0;300147493;0
+;4;;;0;0;300147503;0
+;11;;;0;0;300147505;0

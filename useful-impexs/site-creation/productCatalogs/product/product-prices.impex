@@ -1,0 +1,10 @@
+INSERT_UPDATE PriceRow;productId[unique=true];unit(code[unique=true,default=pieces]);currency(isocode)[unique=true];price;minqtd;unitFactor;net
+;300044617;pieces;GBP;67,96;1;1;false
+;300044617;pieces;EUR;77,88;1;1;false
+;300044617;pieces;USD;105,33;1;1;false
+;300044623;pieces;GBP;84,96;1;1;false
+;300044623;pieces;EUR;97,37;1;1;false
+;300044623;pieces;USD;131,68;1;1;false
+;300044624;pieces;GBP;67,96;1;1;false
+;300044624;pieces;EUR;77,88;1;1;false
+;300044624;pieces;USD;105,33;1;1;false
