@@ -210,7 +210,8 @@
 		</itemtype>
 
         <!-- An new itemtype created as catalog aware itemtype.
-        It is stored in separate table. It has db indexes configured.  
+        It is stored in separate table. It has db indexes configured.
+		It has custom size for string based on database.  
         It also has localized and dynamic attributes. -->
         <itemtype code="Category" generate="true" extends="GenericItem" autocreate="true"
 					jaloclass="de.hybris.platform.category.jalo.Category">
@@ -227,9 +228,24 @@
 					<description>Catalog Category Description</description>
 					<modifiers read="true" write="true" search="true" optional="true"/>
 					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>nvarchar(max)</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>text</value>
+						</columntype>
+						<columntype database="sap">
+                            <value>NCLOB</value>
+                        </columntype>
 						<columntype>
 							<value>HYBRIS.LONG_STRING</value>
 						</columntype>
+						<!-- <columntype>
+							<value>varchar(4000)</value>
+						</columntype> -->
 					</persistence>
 					<custom-properties>
 						<property name="hmcIndexField"><value>"thefield"</value></property>
