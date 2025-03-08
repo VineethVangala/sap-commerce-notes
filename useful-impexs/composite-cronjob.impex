@@ -1,0 +1,10 @@
+INSERT_UPDATE CompositeEntry; code[unique=true]; executableCronJob(code)
+; entry1; cronJob1
+; entry2; cronJob2
+; entry3; cronJob3
+
+INSERT_UPDATE CompositeCronjob; code[unique=true]; job(code); compositeEntries(code); sessionUser(uid)[default=admin]; sessionLanguage(isocode)[default=en]
+; compositeCronJob1; compositeJobPerformable; entry1, entry2, entry3
+
+INSERT_UPDATE Trigger; cronJob(code)[unique=true];cronExpression
+; compositeCronJob1; 0 30 9 ? * SUN *

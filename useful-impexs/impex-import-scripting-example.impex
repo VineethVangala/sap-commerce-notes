@@ -1,0 +1,83 @@
+$storeUid=apparel-de
+$defaultCurrency=EUR
+$defaultLanguage=de
+$googleHost=setthethirdpartyhost
+$googleUserName=setgoogleusername
+$googlePassword=setgooglepassword
+
+
+INSERT_UPDATE ExportDataCronJob;code[unique=true];job(code);baseStore(uid);cmsSite(uid);language(isocode);currency(isocode);user(uid);thirdPartyHost;thirdPartyUsername;thirdPartyPassword;dataGenerationPipeline;sessionLanguage(isocode)
+"#% beforeEach:
+import de.hybris.platform.core.Registry;
+import de.hybris.platform.acceleratorservices.model.export.ExportDataCronJobModel;
+String cronJobCode = line.get(Integer.valueOf(1));
+ExportDataCronJobModel exportDataCronJob;
+try
+{
+    exportDataCronJob = Registry.getApplicationContext().getBean(""cronJobService"").getCronJob(cronJobCode);
+}
+catch (Exception e)
+{
+    exportDataCronJob = null;
+}
+if (exportDataCronJob != null)
+{
+    line.clear();
+}"
+;googleLocationsApparelDe;exportDataJobPerformable;$storeUid;$storeUid;$defaultLanguage;$defaultCurrency;anonymous;$googleHost;$googleUserName;$googlePassword;exportGooglePosPipeline;$defaultLanguage
+;googleProductsApparelDe;exportDataJobPerformable;$storeUid;$storeUid;$defaultLanguage;$defaultCurrency;anonymous;$googleHost;$googleUserName;$googlePassword;exportGoogleProductPipeline;$defaultLanguage
+
+INSERT CronJob;code[unique=true];job(code)[forceWrite=true];baseStore(uid);cmsSite(uid);sessionLanguage(isocode);sessionCurrency(isocode);sessionUser(uid);
+"#% beforeEach:
+import de.hybris.platform.core.Registry;
+import de.hybris.platform.cronjob.model.CronJobModel;
+String cronJobCode = line.get(Integer.valueOf(1));
+CronJobModel cronJob;
+try
+{
+    cronJob = Registry.getApplicationContext().getBean(""cronJobService"").getCronJob(cronJobCode);
+}
+catch (Exception e)
+{
+    cronJob = null;
+}
+if (cronJob != null)
+{
+    line.clear();
+}"
+;uploadExportsApparelDE;uploadDataJobPerformable;$siteUid;$siteUid;$defaultLanguage;$defaultCurrency;anonymous;
+
+$defaultPromoGrp=electronicsPromoGrp
+$defaultRuleGroup=couponPromotionRuleGroup
+$promotionsModule="promotions-module"
+$previewModule="promotions-preview-module"
+
+INSERT_UPDATE CustomerCoupon;couponId(id)[unique=true];startDate[default=01-05-2017,dateformat=dd-MM-yyyy];active[default=true];assignable[default=true]
+;midautumn
+
+INSERT_UPDATE PromotionSourceRule;code[unique=true];priority;maxAllowedRuns;stackable[default=false];ruleGroup(code)[default=$defaultRuleGroup];conditions;actions;website(Identifier)[default=$defaultPromoGrp];excludeFromStorefrontDisplay[default=false];startDate[default=01-05-2017,dateformat=dd-MM-yyyy]
+"#% afterEach: de.hybris.platform.core.Registry.getApplicationContext().getBean(""ruleEngineSystemSetup"").registerSourceRuleForDeployment(impex.getLastImportedItem(), new String[]{$promotionsModule,$previewModule});"
+;midautumncouponbasedpromotion;180;1;;;"[{""definitionId"":""y_qualifying_coupons"",""parameters"":{""coupons"":{""uuid"":""228f0f4f-d24f-4325-b1a7-ef9b47c69f21"",""type"":""List(ItemType(AbstractCoupon))"",""value"":[""midautumn""]}},""children"":[]},{""definitionId"":""y_qualifying_products"",""parameters"":{""catalog"":{""uuid"":""bc350ff4-a10e-45e5-91ee-0bbed6d4b63a"",""type"":""ItemType(Catalog)"",""value"":""electronicsProductCatalog""},""products_operator"":{""uuid"":""d8d6576e-a579-49bd-a36e-3e8abc0a93ce"",""type"":""Enum(de.hybris.platform.ruledefinitions.CollectionOperator)"",""value"":""CONTAINS_ANY""},""quantity"":{""uuid"":""8b8fae6d-183a-4118-9ea3-af21a27a84d2"",""type"":""java.lang.Integer"",""value"":1},""operator"":{""uuid"":""58143771-ab68-450a-8e92-5b46891a3f0a"",""type"":""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",""value"":""GREATER_THAN_OR_EQUAL""},""products"":{""uuid"":""2a1d0128-529d-4f42-8239-8a7f78369991"",""type"":""List(ItemType(Product))"",""value"":[""1934793""]}},""children"":[]}]";"[{""definitionId"":""y_order_entry_fixed_discount"",""parameters"":{""value"":{""uuid"":""1d8bf69f-f897-4d3b-bed9-70ab11c3b6b9"",""type"":""Map(ItemType(Currency),java.math.BigDecimal)"",""value"":{""USD"":20}}}}]"
+
+
+$destination_target=Default_Template
+
+INSERT_UPDATE Endpoint;id[unique=true];name;version[unique=true];description;specUrl;specData;extensionName
+"#%beforeEach:
+import de.hybris.platform.core.Registry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
+import de.hybris.platform.util.Config;
+
+Logger LOG = LoggerFactory.getLogger(""ImpExImportReader"");
+extensionNames = Registry.getCurrentTenant().getTenantSpecificExtensionNames();
+extensionName = line.get(7);
+endpointId = line.get(1);
+    if(!StringUtils.isEmpty(extensionName) && !extensionNames.contains(extensionName))
+    {
+        LOG.info(""Endpoint [{}] was skipped because the extension [{}] containing the endpoint is not included in the setup"", endpointId, extensionName);
+        line.clear();
+    }
+"
+;cc-commercewebservices;CC OCC Commerce Webservices v2;v2;"Commerce Cloud OCC Commerce Webservices v2";{ccv2.services.api.url.0}/occ/v2/api-docs;;commercewebservices

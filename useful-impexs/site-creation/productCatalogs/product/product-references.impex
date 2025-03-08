@@ -1,0 +1,11 @@
+$productCatalog=apparelProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+
+# Insert Product References
+INSERT_UPDATE ProductReference;source(code,$catalogVersion)[unique=true];target(code,$catalogVersion)[unique=true];referenceType(code);active[default=true];preselected[default=false]
+;100746_floging_pink;100744_pool_green;SIMILAR
+;94374_air;94714_blue;SIMILAR
+;94374_air;94714_royal;SIMILAR
+;94374_air;95464_team_blue;SIMILAR
+;94374_air;122312_lime;CROSSELLING
+;94374_air;117911_white;CROSSELLING

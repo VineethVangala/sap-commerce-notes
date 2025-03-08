@@ -1,0 +1,16 @@
+
+INSERT_UPDATE OAuthClientDetails;clientId[unique=true];resourceIds;scope;authorizedGrantTypes;clientSecret;authorities
+                                ;kyma;hybris;basic;authorization_code,refresh_token,password,client_credentials;password;ROLE_TRUSTED_CLIENT
+                                ;kyma1;hybris;basic;authorization_code,refresh_token,password,client_credentials;password;ROLE_TRUSTED_CLIENT
+
+INSERT_UPDATE ExposedOAuthCredential;id[unique=true];oAuthClientDetails(clientId);password
+                                    ;kymaCred1;kyma;secret
+                                    ;kymaCred2;kyma;secret
+                                    ;kymaCred3;kyma1;secret
+
+
+INSERT_UPDATE OAuthClientDetails;clientId[unique=true]	;resourceIds	;scope		;authorizedGrantTypes											;authorities			;clientSecret	;registeredRedirectUri
+								;client-side			;hybris			;basic		;implicit,client_credentials									;ROLE_CLIENT			;secret			;http://localhost:9001/authorizationserver/oauth2_implicit_callback;
+								;mobile_android			;hybris			;basic		;authorization_code,refresh_token,password,client_credentials	;ROLE_CLIENT			;secret			;http://localhost:9001/authorizationserver/oauth2_callback;
+								;trusted_client			;hybris			;extended	;authorization_code,refresh_token,password,client_credentials	;ROLE_TRUSTED_CLIENT	;secret;		;
+

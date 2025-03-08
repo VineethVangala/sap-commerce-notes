@@ -1,0 +1,144 @@
+# ***************************************************************************************
+#     Set up the classifications v1
+# ***************************************************************************************
+
+
+# The following ImpEx provides a full example of
+# 1) Creating classifications
+# 2) Creating Integration Object with classification attributes
+# 3) Creating a Product
+# 4) Assigning classification classes to a product
+# 5) Setting values to the classification attributes on that product
+
+$catalogVersionHeader = catalogVersion(catalog(id), version)
+$systemVersionHeader = systemVersion(catalog(id), version)
+$classificationClassHeader = classificationClass(catalogVersion(catalog(id), version), code)
+$classificationAttributeHeader = classificationAttribute($systemVersionHeader, code)
+
+$systemVersion = Electronics:Photography
+$weightAttr = $systemVersion:weight
+$heightAttr = $systemVersion:height
+$descAttr = $systemVersion:description
+
+$lensClass = $systemVersion:lens
+$imgStabtAttr = $systemVersion:imageStabilizerAvailable
+$focalLengthAttr = $systemVersion:focalLength
+$focalLengthsAttr = $systemVersion:focalLengths
+$hoodAttr = $systemVersion:hood
+
+$tripodClass = $systemVersion:tripod
+$cameraClass = $systemVersion:camera
+
+$qualifierPrefix = Electronics/Photography
+$product = Default:Staged:photographypackage
+
+#INSERT_UPDATE Product; code[unique = true]; name[lang = en]    ; $catalogVersionHeader[unique = true]
+#                     ; photographypackage ; Photograph Package ; Default:Staged
+
+                     
+INSERT_UPDATE ClassificationSystem; id[unique = true]; name[lang = en]
+                                  ; Electronics      ; Electronics
+
+INSERT_UPDATE ClassificationSystemVersion; catalog(id)[unique = true]; version[unique = true]
+                                         ; Electronics               ; Photography
+
+INSERT_UPDATE ClassificationClass; code[unique = true]; name[lang = en]; $catalogVersionHeader[unique = true]
+                                 ; tripod             ; Tripod         ; $systemVersion
+                                 ; camera             ; Camera         ; $systemVersion
+                                 ; lens               ; Lens           ; $systemVersion
+
+INSERT_UPDATE ClassificationAttributeUnit; code[unique = true]; symbol; unitType    ; $systemVersionHeader[unique = true]
+                                         ; centimeters        ; cm    ; measurement ; $systemVersion
+                                         ; millimeters        ; mm    ; measurement ; $systemVersion
+                                         ; meters             ; m     ; measurement ; $systemVersion
+                                         ; grams              ; g     ; measurement ; $systemVersion
+                                         ; kilograms          ; kg    ; measurement ; $systemVersion
+
+INSERT_UPDATE ClassificationAttribute; code[unique = true]      ; name[lang = en]            ; $systemVersionHeader[unique = true]
+                                     ; weight                   ; Weight                     ; $systemVersion
+                                     ; focalLength              ; Focal Length               ; $systemVersion
+                                     ; focalLengths             ; Focal Lengths              ; $systemVersion
+                                     ; imageStabilizerAvailable ; Image Stabilizer Available ; $systemVersion
+                                     ; description              ; Description                ; $systemVersion
+                                     ; height                   ; Height                     ; $systemVersion
+                                     ; hood                     ; Lens Hood                  ; $systemVersion
+
+INSERT_UPDATE ClassAttributeAssignment; classificationClass($catalogVersionHeader, code)[unique = true]; classificationAttribute($systemVersionHeader, code)[unique = true]; unit($systemVersionHeader, code); attributeType(code); localized[default = false]; multiValued[default = false]; referenceType(code)[unique = true]
+                                      ; $systemVersion:tripod                                          ; $systemVersion:height                                             ; $systemVersion:centimeters      ; number             ;                           ;                             ;
+                                      ; $systemVersion:camera                                          ; $systemVersion:weight                                             ; $systemVersion:grams            ; number             ;                           ;                             ;
+                                      ; $systemVersion:camera                                          ; $systemVersion:description                                        ;                                 ; string             ; true                      ;                             ;
+                                      ; $systemVersion:lens                                            ; $systemVersion:weight                                             ; $systemVersion:grams            ; number             ;                           ;                             ;
+                                      ; $systemVersion:lens                                            ; $systemVersion:focalLength                                        ; $systemVersion:millimeters      ; number             ;                           ;                             ;
+                                      ; $systemVersion:lens                                            ; $systemVersion:focalLengths                                       ; $systemVersion:millimeters      ; number             ;                           ; true                        ;
+                                      ; $systemVersion:lens                                            ; $systemVersion:imageStabilizerAvailable                           ;                                 ; boolean            ;                           ;                             ;
+                                      ; $systemVersion:lens                                            ; $systemVersion:description                                        ;                                 ; string             ;                           ;                             ;
+                                      ; $systemVersion:lens                                            ; $systemVersion:hood                                               ;                                 ; reference          ;                           ;                             ; Product
+
+# Assign the product to the class
+INSERT_UPDATE ClassificationClass; code[unique = true]; catalogVersion(catalog(id), version)[unique = true]; products($catalogVersionHeader, code)
+                                 ; tripod             ; $systemVersion                                     ; $product
+                                 ; camera             ; $systemVersion                                     ; $product
+                                 ; lens               ; $systemVersion                                     ; $product
+
+# Set the values of the classification attributes on the product - Way 1 - use for multivalued features
+INSERT_UPDATE ProductFeature; product($catalogVersionHeader, code)[unique = true]; classificationAttributeAssignment($classificationClassHeader, $classificationAttributeHeader)[unique = true]; qualifier                                      ; value[translator = de.hybris.platform.catalog.jalo.classification.impex.ProductFeatureValueTranslator]; unit($systemVersionHeader, code); valueDetails; valuePosition[unique = true, default = 0]; language(isocode)[allownull = true]
+                            ; $product                                           ; $lensClass:$descAttr                                                                                        ; $qualifierPrefix/lens.description              ; "string, wide angle lens"                                                                             ;                                 ;             ;                                          ; en
+                            ; $product                                           ; $lensClass:$weightAttr                                                                                      ; $qualifierPrefix/lens.weight                   ; "number, java.lang.Double, 500.5"                                                                     ; $systemVersion:grams            ;             ;                                          ;
+                            ; $product                                           ; $lensClass:$imgStabtAttr                                                                                    ; $qualifierPrefix/lens.imageStabilizerAvailable ; "boolean, true"                                                                                       ;                                 ;             ;                                          ;
+                            ; $product                                           ; $lensClass:$focalLengthsAttr                                                                                ; $qualifierPrefix/lens.focalLengths             ; "number, java.lang.Double, 50"                                                                        ; $systemVersion:millimeters      ;             ;                                          ;
+                            ; $product                                           ; $lensClass:$focalLengthsAttr                                                                                ; $qualifierPrefix/lens.focalLengths             ; "number, java.lang.Double, 85"                                                                        ; $systemVersion:millimeters      ;             ; 1                                        ;
+#                            ; $product                                           ; $lensClass:$hoodAttr                                                                                        ; $qualifierPrefix/lens.hood                     ; "reference, <REPLACE WITH PK for universalLensHood>"                                                  ;                                 ;             ;                                          ;
+                            ; $product                                           ; $tripodClass:$heightAttr                                                                                    ; $qualifierPrefix/tripod.height                 ; "number, java.lang.Double, 1.75"                                                                      ; $systemVersion:meters           ;             ;                                          ;
+                            ; $product                                           ; $cameraClass:$weightAttr                                                                                    ; $qualifierPrefix/camera.weight                 ; "number, java.lang.Double, 2.25"                                                                      ; $systemVersion:kilograms        ;             ;                                          ;
+                            ; $product                                           ; $cameraClass:$descAttr                                                                                      ; $qualifierPrefix/camera.description            ; "string, This camera does amazing things!"                                                            ;                                 ;             ;                                          ; en
+
+
+
+
+# Set the values of the classification attributes on the product - Way 2 - use for single valued features
+# Macros / Replacement Parameter definitions
+$productCatalog=wsTestProductCatalog
+$productCatalogName=wsTest Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$clAttrModifiers=system='wsTestClassification',version='1.0',translator=de.hybris.platform.catalog.jalo.classification.impex.ClassificationAttributeTranslator,lang=en
+
+# Insert Product Classifications
+
+# Classification: Technical details (634)
+$feature1=@Tripod legs, 1868[$clAttrModifiers];  # Tripod legs
+$feature2=@Mounting, 1867[$clAttrModifiers];  # Mounting
+$feature3=@Colour of product, 1766[$clAttrModifiers];  # Colour of product
+$feature4=@Tripod head, 1869[$clAttrModifiers];  # Tripod head
+$feature6=@Special features, 86[$clAttrModifiers];  # Special features
+$feature7=@Material, 898[$clAttrModifiers];  # Material
+$feature8=@Source data-sheet, 6617[$clAttrModifiers];  # Source data-sheet
+INSERT_UPDATE Product;code[unique=true];$feature1;$feature2;$feature3;$feature4;$feature6;$feature7;$feature8;$catalogVersion;
+ ;1687508;3 leg(s);Floor-standing;<ignore>;<ignore>;<ignore>;<ignore>;ICEcat.biz;
+ ;3429337;3;<ignore>;Black;<ignore>;<ignore>;Rubber;ICEcat.biz;
+
+ # Classification: Focusing (2759)
+$feature1=@Normal focusing range, 3730[$clAttrModifiers];  # Normal focusing range in meter (m)
+$feature2=@Macro focusing range  tel, 3732[$clAttrModifiers];  # Macro focusing range (tele)in meter (m)
+$feature3=@Focus adjustment, 1600[$clAttrModifiers];  # Focus adjustment
+$feature4=@Camera focusing range, 1291[$clAttrModifiers];  # Camera focusing range
+$feature5=@Auto Focus  AF  illuminat, 3740[$clAttrModifiers];  # Auto Focus (AF) illuminator
+$feature6=@Macro focusing range  wid, 3731[$clAttrModifiers];  # Macro focusing range (wide)in meter (m)
+$feature7=@Auto Mode focusing range , 3734[$clAttrModifiers];  # Auto Mode focusing range (wide)in meter (m)
+$feature10=@Auto Mode focusing range , 3735[$clAttrModifiers];  # Auto Mode focusing range (tele)in meter (m)
+$feature11=@Manual focus, 3738[$clAttrModifiers];  # Manual focus
+$feature13=@Auto Focus  AF  assist be, 3748[$clAttrModifiers];  # Auto Focus (AF) assist beam
+$feature15=@Auto Focus  AF  lock, 3739[$clAttrModifiers];  # Auto Focus (AF) lock
+$feature16=@Focus, 759[$clAttrModifiers];  # Focus
+$feature17=@Closest focusing distance, 2726[$clAttrModifiers];  # Closest focusing distance in meter (m)
+$feature18=@Auto focus, 1614[$clAttrModifiers];  # Auto focus
+$feature19=@Auto focusing  AF  modes, 7365[$clAttrModifiers];  # Auto focusing (AF) modes
+INSERT_UPDATE Product;code[unique=true];$feature1;$feature2;$feature3;$feature4;$feature5;$feature6;$feature7;$feature10;$feature11;$feature13;$feature15;$feature16;$feature17;$feature18;$feature19;$catalogVersion;
+ ;1382080;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;true;<ignore>;<ignore>;<ignore>;<ignore>;true;<ignore>;
+ ;1934793;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;0.01;true;<ignore>;
+ ;1981415a;0.8 , ï¿½?ï¿½;0.5 , 0.8;<ignore>;<ignore>;<ignore>;0.1 , 0.8;0.1 , ï¿½?ï¿½;0.5 , ï¿½?ï¿½;true;<ignore>;<ignore>;<ignore>;<ignore>;true;centre weighted auto focus,multi point auto focus;
+ ;2006139;0.6;0.60 , 0.70;<ignore>;<ignore>;<ignore>;0.10 , 0.70;<ignore>;<ignore>;true;<ignore>;<ignore>;<ignore>;<ignore>;true;centre weighted auto focus,single auto focus,continuous auto focus,multi point auto focus;
+ ;2053226;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;true;<ignore>;true;TTL-CT-SIR;<ignore>;true;<ignore>;
+ ;2053266;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;true;<ignore>;true;TTL-CT-SIR;<ignore>;true;<ignore>;
+ ;2053367;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;true;<ignore>;true;TTL-CT-SIR;<ignore>;true;<ignore>;
+ ;3557133;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;<ignore>;true;<ignore>;true;TTL-CT-SIR;<ignore>;true;<ignore>;
+ ;816780;<ignore>;<ignore>;<ignore>;<ignore>;true;<ignore>;<ignore>;<ignore>;true;<ignore>;true;<ignore>;5;true;single auto focus,spot auto focus,continuous auto focus;
