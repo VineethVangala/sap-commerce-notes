@@ -1,4 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+
+<beans xmlns:beans="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/integration"
+       xmlns:int-http="http://www.springframework.org/schema/integration/http"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/integration
+           http://www.springframework.org/schema/integration/spring-integration.xsd
+           http://www.springframework.org/schema/integration/http
+           http://www.springframework.org/schema/integration/http/spring-integration-http.xsd">
+
+    <gateway id="customGetGateway" service-interface="custom.integrations.service.gatewy.CustomGetGateway"
+        error-channel="customGetErrorChannel" default-reply-timeout="10000"/>
+
+    <gateway id="customPostGateway" service-interface="custom.integrations.service.gatewy.CustomPostGateway"
+        error-channel="customPostErrorChannel" default-reply-timeout="10000"/>
+
+    <channel id="customGetRequestChannel"/>
+    <channel id="customGetResponseChannel"/>
+    <channel id="customGetErrorChannel"/>
+
+    <channel id="customPostRequestChannel"/>
+    <channel id="customPostResponseChannel"/>
+    <channel id="customPostErrorChannel"/>
+
+
+    <chain input-channel="customGetRequestChannel" output-channel="customGetResponseChannel">
+
+        <header-enricher>
+            <header name="Accept" expression="'application/json'"/>
+            <header name="Content-type" expression="'application/json';charset=utf-8"/>
+            <header name="urlParam1" expression="'payload.getUrlParam1()'"/>
+        </header-enricher>
+
+        <int-http:outbound-gateway url="custom{get_url_key}?param={urlParam1}" http-method="GET"
+            mapped-request-headers="accept,Content-Type,urlParam1"
+            rest-template="restTemplate"
+            expected-response-type="custom.integrations.rest.model.CustomGetResponseImpl">
+                <int-http:uri-variable name="urlParam1" expression="headers['urlParam1']"> </int-http:uri-variable>
+        </int-http:outbound-gateway>
+    </chain>
+
+    <chain input-channel="customGetErrorChannel" output-channel="customGetResponseChannel">
+        <service-activator ref="springIntegrationResponseExceptionHandler" method="handleCustomGetResponse"/>
+    </chain>
+
+
+    <chain input-channel="customPostRequestChannel" output-channel="customPostResponseChannel">
+
+        <header-enricher>
+            <header name="Accept" expression="'application/json'"/>
+            <header name="Content-type" expression="'application/json';charset=utf-8"/>
+            <header name="request" expression="'payload'"/>
+        </header-enricher>
+
+        <int-http:outbound-gateway url="custom{post_url_key}" http-method="Post"
+            mapped-request-headers="accept,Content-Type"
+            rest-template="restTemplate"
+            expected-response-type="custom.integrations.rest.model.CustomPostResponseImpl">
+                <int-http:uri-variable name="request" expression="headers['request']"> </int-http:uri-variable>
+        </int-http:outbound-gateway>
+    </chain>
+
+    <chain input-channel="customPostErrorChannel" output-channel="customPostResponseChannel">
+        <service-activator ref="springIntegrationResponseExceptionHandler" method="handleCustomPostResponse"/>
+    </chain>
+</beans>
+
+
+
 <!--
  Copyright (c) 2021 SAP SE or an SAP affiliate company. All rights reserved.
 -->

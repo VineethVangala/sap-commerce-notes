@@ -1,0 +1,695 @@
+<config xmlns="http://www.hybris.com/cockpit/config"
+		xmlns:y="http://www.hybris.com/cockpit/config/hybris"
+		xmlns:yc="http://www.hybris.com/cockpitng/config/common"
+		xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea"
+		xmlns:na="http://www.hybris.com/cockpitng/config/notifications"
+		xmlns:ql="http://www.hybris.com/cockpitng/component/quick-list"
+		xmlns:et="http://www.hybris.com/cockpitng/config/explorertree"
+		xmlns:lv="http://www.hybris.com/cockpitng/component/listView"
+		xmlns:cv="http://www.hybris.com/cockpitng/component/compareview"
+		xmlns:dsb="http://www.hybris.com/cockpitng/config/dashboard"
+		xmlns:dnd="http://www.hybris.com/cockpitng/component/dragAndDrop"
+		xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser"
+		xmlns:sl="http://www.hybris.com/cockpitng/config/extendedsplitlayout"
+		xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+		xmlns:sv="http://www.hybris.com/cockpitng/component/summaryview"
+		xmlns:ss="http://www.hybris.com/cockpitng/config/simplesearch"
+		xmlns:fs="http://www.hybris.com/cockpitng/config/fulltextsearch"
+		xmlns:gv="http://www.hybris.com/cockpitng/component/gridView">
+
+    <context component="explorer-tree" merge-by="module">
+		<et:explorer-tree>
+			<et:navigation-node id="hmc_treenode_catalog">
+				<et:type-node code="Catalog" id="hmc_typenode_catalog"/>
+				<et:type-node code="CatalogVersion" id="hmc_typenode_catalogversion"/>
+				<et:type-node code="Category" id="hmc_typenode_category"/>
+				<et:type-node code="Product" id="hmc_typenode_product"/>
+				<et:type-node code="VariantType" id="hmc_typenode_varianttype"/>
+				<et:type-node code="Unit" id="hmc_typenode_unit"/>
+				<et:type-node code="Keyword" id="hmc_typenode_keyword"/>
+				<et:navigation-node id="hmc_treenode_classificationgroup">
+					<et:type-node code="classificationclass" id="hmc_typenode_classificationclass"/>
+					<et:type-node code="classificationattribute" id="hmc_typenode_classificationattribute"/>
+					<et:type-node code="classificationattributevalue"
+								  id="hmc_typenode_classificationattributevalue"/>
+					<et:type-node code="ClassificationAttributeUnit"
+								  id="hmc_typenode_classificationattributeunit"/>
+				</et:navigation-node>
+			</et:navigation-node>
+	</context>
+
+    <context component="create-wizard" type="Product">
+		<wz:flow id="ProductWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:handler handlerId="customDoneHandler" handlerBean="productMediaComposedFlowActionHandler">
+				<wz:additionalParams key="handler:savePicture" value="mediaReferenceCreateHandler"/>
+				<wz:additionalParams key="savePicture:mediaProperty" value="newProduct.picture"/>
+				<wz:additionalParams key="savePicture:saveParentObject" value="true"/>
+				<wz:additionalParams key="savePicture:mediaContentProperty" value="createProductPicture"/>
+				<wz:additionalParams key="savePicture:mediaCodeExpression" value="newProduct.code+'_picture'"/>
+				<wz:additionalParams key="savePicture:catalogVersionProperty" value="newProduct.catalogVersion"/>
+				<wz:additionalParams key="savePicture:throwExceptionsOnError" value="true"/>
+				<wz:additionalParams key="handler:saveThumbnail" value="mediaReferenceCreateHandler"/>
+				<wz:additionalParams key="saveThumbnail:mediaProperty" value="newProduct.thumbnail"/>
+				<wz:additionalParams key="saveThumbnail:saveParentObject" value="true"/>
+				<wz:additionalParams key="saveThumbnail:mediaContentProperty" value="createProductThumbnail"/>
+				<wz:additionalParams key="saveThumbnail:mediaCodeExpression" value="newProduct.code+'_thumbnail'"/>
+				<wz:additionalParams key="saveThumbnail:catalogVersionProperty" value="newProduct.catalogVersion"/>
+				<wz:additionalParams key="saveThumbnail:throwExceptionsOnError" value="true"/>
+				<wz:additionalParams key="handler:saveLogos" value="multiMediaReferenceCreateHandler"/>
+				<wz:additionalParams key="saveLogos:mediaProperty" value="newProduct.logo"/>
+				<wz:additionalParams key="saveLogos:saveParentObject" value="true"/>
+				<wz:additionalParams key="saveLogos:mediaContentProperty" value="createProductLogos"/>
+				<wz:additionalParams key="saveLogos:mediaCodeExpression" value="newProduct.code+'_logo#'"/>
+				<wz:additionalParams key="saveLogos:catalogVersionProperty" value="newProduct.catalogVersion"/>
+				<wz:additionalParams key="saveLogos:throwExceptionsOnError" value="true"/>
+				<wz:additionalParams key="saveLogos:append" value="true"/>
+			</wz:handler>
+			<wz:prepare id="productPrepare" handler="productWizardCatalogVersionPopulator">
+				<wz:initialize property="newProduct" type="ctx.TYPE_CODE"/>
+				<wz:assign property="newProduct.code" value="ctx.code"/>
+				<wz:assign property="newProduct.code" value="ctx?.actionContext?.code"/>
+                <wz:assign property="newProduct.supercategories" value="T(com.hybris.cockpitng.util.ListJoiner).join(newProduct.supercategories, ctx?.actionContext?.supercategories)"/>
+			</wz:prepare>
+			<wz:step id="step1" label="create.product.essential.label" sublabel="create.product.essential.sublabel">
+				<wz:content id="step1.content">
+					<wz:property-list root="newProduct">
+						<wz:property qualifier="code" type="java.lang.String"/>
+						<wz:property qualifier="approvalStatus"/>
+						<wz:property qualifier="catalogVersion">
+							<wz:editor-parameter>
+								<wz:name>availableValuesProvider</wz:name>
+								<wz:value>writableCatalogVersionSearchFacade</wz:value>
+							</wz:editor-parameter>
+						</wz:property>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel>
+						<wz:revert property="newProduct.picture"/>
+						<wz:revert property="newProduct.thumbnail"/>
+						<wz:revert property="newProduct.logo"/>
+						<wz:revert property="newProduct"/>
+					</wz:cancel>
+					<wz:next visible="!#empty(newProduct.code) and newProduct.catalogVersion != null"/>
+                    <wz:custom visible="!#empty(newProduct.code) and newProduct.catalogVersion != null" label="com.hybris.cockpitng.widgets.configurableflow.flow.done"
+							   composedHandler="customDoneHandler">
+						<wz:save property="newProduct"/>
+					</wz:custom>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step2" label="create.product.descriptions.label"
+					 sublabel="create.product.descriptions.sublabel">
+				<wz:content id="step2.content">
+					<wz:property-list root="newProduct">
+						<wz:property qualifier="name" type="java.lang.String"/>
+						<wz:property editor="com.hybris.cockpitng.editor.localized(com.hybris.cockpitng.editor.wysiwyg)"
+									 qualifier="description" type="java.lang.String"/>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step2.navigation">
+					<wz:cancel>
+						<wz:revert property="newProduct.picture"/>
+						<wz:revert property="newProduct.thumbnail"/>
+						<wz:revert property="newProduct.logo"/>
+						<wz:revert property="newProduct"/>
+					</wz:cancel>
+					<wz:back/>
+					<wz:next/>
+                    <wz:custom label="com.hybris.cockpitng.widgets.configurableflow.flow.done" composedHandler="customDoneHandler">
+						<wz:save property="newProduct"/>
+					</wz:custom>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step3" label="create.product.categories.label" sublabel="create.product.categories.sublabel">
+				<wz:info label="create.product.categories.info.label" position="top"/>
+				<wz:content id="step3.content">
+					<wz:property qualifier="newProduct.supercategories"/>
+				</wz:content>
+				<wz:navigation id="step3.navigation">
+					<wz:cancel>
+						<wz:revert property="newProduct.picture"/>
+						<wz:revert property="newProduct.thumbnail"/>
+						<wz:revert property="newProduct.logo"/>
+						<wz:revert property="newProduct"/>
+					</wz:cancel>
+					<wz:back/>
+					<wz:next/>
+                    <wz:custom label="com.hybris.cockpitng.widgets.configurableflow.flow.done" composedHandler="customDoneHandler">
+						<wz:save property="newProduct"/>
+					</wz:custom>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step4" label="create.product.media.label" sublabel="create.product.media.sublabel">
+				<wz:info label="create.product.media.info.label" position="top"/>
+				<wz:content id="step4.content">
+					<wz:property qualifier="newProduct.picture" validate="false"/>
+                    <wz:property qualifier="createProductPicture" type="com.hybris.cockpitng.editor.defaultfileupload.FileUploadResult" editor="com.hybris.cockpitng.editor.dndfileupload" validate="false">
+						<wz:editor-parameter>
+							<wz:name>accept</wz:name>
+							<wz:value>image/*</wz:value>
+						</wz:editor-parameter>
+						<wz:editor-parameter>
+							<wz:name>singleLineMode</wz:name>
+							<wz:value>true</wz:value>
+						</wz:editor-parameter>
+					</wz:property>
+					<wz:property qualifier="newProduct.thumbnail" validate="false"/>
+                    <wz:property qualifier="createProductThumbnail" type="com.hybris.cockpitng.editor.defaultfileupload.FileUploadResult" editor="com.hybris.cockpitng.editor.dndfileupload"  validate="false">
+						<wz:editor-parameter>
+							<wz:name>accept</wz:name>
+							<wz:value>image/*</wz:value>
+						</wz:editor-parameter>
+						<wz:editor-parameter>
+							<wz:name>singleLineMode</wz:name>
+							<wz:value>true</wz:value>
+						</wz:editor-parameter>
+					</wz:property>
+					<wz:property qualifier="newProduct.logo" validate="false"/>
+                    <wz:property qualifier="createProductLogos" type="java.util.Collection" editor="com.hybris.cockpitng.editor.multidndfileupload" validate="false">
+						<wz:editor-parameter>
+							<wz:name>accept</wz:name>
+							<wz:value>image/*</wz:value>
+						</wz:editor-parameter>
+						<wz:editor-parameter>
+							<wz:name>singleLineMode</wz:name>
+							<wz:value>true</wz:value>
+						</wz:editor-parameter>
+					</wz:property>
+				</wz:content>
+				<wz:navigation id="step4.navigation">
+					<wz:cancel>
+						<wz:revert property="newProduct.picture"/>
+						<wz:revert property="newProduct.thumbnail"/>
+						<wz:revert property="newProduct.logo"/>
+						<wz:revert property="newProduct"/>
+					</wz:cancel>
+					<wz:back/>
+                    <wz:custom label="com.hybris.cockpitng.widgets.configurableflow.flow.done" composedHandler="customDoneHandler">
+						<wz:save property="newProduct"/>
+					</wz:custom>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context type="Product" component="configurableFlowDynamicForms">
+		<df:dynamicForms modelProperty="newProduct">
+            <df:attribute id="disableCreatePicture" triggeredOn="newProduct.picture" qualifier="createProductPicture" disabledIf="newProduct.picture!=null" modelProperty="*"/>
+            <df:attribute id="disablePictureEditor" triggeredOn="createProductPicture" qualifier="newProduct.picture" disabledIf="createProductPicture!=null" modelProperty="*"/>
+            <df:attribute id="disableCreateThumbnail" triggeredOn="newProduct.thumbnail" qualifier="createProductThumbnail" disabledIf="newProduct.thumbnail!=null" modelProperty="*"/>
+            <df:attribute id="disableThumbnailEditor" triggeredOn="createProductThumbnail" qualifier="newProduct.thumbnail" disabledIf="createProductThumbnail!=null" modelProperty="*"/>
+		</df:dynamicForms>
+	</context>
+
+    <context type="Product" component="listviewactions" merge-by="type">
+		<y:actions>
+			<y:group qualifier="common" show-group-header="false" position="10">
+				<y:action action-id="com.hybris.cockpitng.listview.action.export.csv" merge-mode="REMOVE"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.sync" property="selectedObjects"
+						  position="30"/>
+			</y:group>
+			<y:group qualifier="bulk" show-group-header="false" position="20">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.enumeration" property="selectedObjects"
+						  position="10">
+					<y:parameter>
+						<yc:name>qualifier</yc:name>
+						<yc:value>approvalStatus</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>actionName</yc:name>
+						<yc:value>bulk.approval</yc:value>
+					</y:parameter>
+				</y:action>
+			</y:group>
+			<y:extended-group qualifier="export" show-group-header="false" position="30">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.excel.export" property="pageable.typeCode"
+						  position="10"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.excel.exporttemplate"
+						  property="pageable.typeCode" position="20"/>
+				<y:action action-id="com.hybris.cockpitng.listview.action.export.csv" property="exportColumnsAndData"
+						  position="30">
+					<y:parameter>
+						<yc:name>actionName</yc:name>
+						<yc:value>label.export.csv</yc:value>
+					</y:parameter>
+				</y:action>
+				<y:extended-action action-id="com.hybris.backoffice.widgets.actions.excel.export" position="40"/>
+			</y:extended-group>
+			<y:group qualifier="import" show-group-header="false" show-separator="false" position="40">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.excel.import" property="pageable.typeCode"
+						  position="10"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+    <context merge-by="module" type="Product" component="editor-area">
+        <editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+            <editorArea:tab name="hmc.tab.product.properties">
+                <editorArea:section name="hmc.product.descriptions">
+                    <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="summary"/>
+                </editorArea:section>
+            </editorArea:tab>
+            <editorArea:tab name="hmc.tab.product.multimedia">
+                <editorArea:section name="hmc.section.product.additionalmedias">
+                    <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="galleryImages"/>
+                </editorArea:section>
+            </editorArea:tab>
+            <editorArea:tab name="hmc.tab.community">
+                <editorArea:section name="hmc.product.sections.customerreviews">
+                    <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="reviewCount" readonly="true"/>
+                    <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="reviewRating" readonly="true"/>
+                </editorArea:section>
+            </editorArea:tab>
+            <editorArea:tab name="hmc.tab.product.stock" position="35">
+                <editorArea:section name="hmc.tab.product.stockfinder"/>
+					<editorArea:section name="hmc.section.warehouse.stocklevels">
+						<editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea"
+													 editor="de.hybris.platform.commerceservices.backoffice.editor.stocklevelfindereditor"
+													 qualifier="stockLevels" label="hmc.text.product.usesearchtogetstocklevels">
+							<editorArea:editor-parameter>
+								<editorArea:name>stockLevelSearchField</editorArea:name>
+								<editorArea:value>product</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+
+    <context type="Product" component="editorareaactions">
+		<y:actions>
+			<y:group qualifier="common" position="10">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.delete" property="currentObject" position="10"/>
+				<y:action action-id="com.hybris.cockpitng.action.clone" property="currentObject" position="20"/>
+                <y:action action-id="com.hybris.backoffice.widgets.actions.sync" property="currentObject" position="30"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+    <context merge-by="type" parent="GenericItem" type="Product" component="base">
+		<y:base>
+			<y:labels>
+                <y:label>( name ?: '' ) + ' ['+ ( code ?: '' ) +'] - ' + @labelService.getObjectLabel(catalogVersion)</y:label>
+				<y:description>description != null ? description : @labelService.getObjectLabel(#this)</y:description>
+			</y:labels>
+			<y:preview urlQualifier="thumbnail?:picture"/>
+		</y:base>
+	</context>
+
+    <context merge-by="type" parent="GenericItem" type="Product" component="simple-search">
+		<ss:simple-search>
+			<ss:field name="code"/>
+			<ss:field name="name"/>
+		</ss:simple-search>
+	</context>
+
+    <context type="Product" component="advanced-search" merge-by="type" parent="GenericItem">
+		<as:advanced-search>
+			<as:field-list>
+				<as:field name="code" selected="true" operator="contains"/>
+				<as:field name="name" selected="true" operator="contains"/>
+				<as:field name="catalogVersion" selected="true" operator="equals"/>
+				<as:field name="variantType" selected="true" operator="equals"/>
+				<as:field name="Europe1PriceFactory_PDG"/>
+				<as:field name="Europe1PriceFactory_PPG"/>
+				<as:field name="Europe1PriceFactory_PTG"/>
+				<as:field name="approvalStatus"/>
+				<as:field name="articleStatus"/>
+				<as:field name="contentUnit"/>
+				<as:field name="deliveryTime"/>
+				<as:field name="description"/>
+				<as:field name="ean"/>
+				<as:field name="endLineNumber"/>
+				<as:field name="erpGroupBuyer"/>
+				<as:field name="erpGroupSupplier"/>
+				<as:field name="keywords"/>
+				<as:field name="manufacturerAID"/>
+				<as:field name="manufacturerName"/>
+				<as:field name="manufacturerTypeDescription"/>
+				<as:field name="maxOrderQuantity"/>
+				<as:field name="minOrderQuantity"/>
+				<as:field name="numberContentUnits"/>
+				<as:field name="offlineDate"/>
+				<as:field name="onlineDate"/>
+				<as:field name="order"/>
+				<as:field name="orderQuantityInterval"/>
+				<as:field name="picture"/>
+				<as:field name="priceQuantity"/>
+				<as:field name="remarks"/>
+				<as:field name="segment"/>
+				<as:field name="startLineNumber"/>
+				<as:field name="supercategories"/>
+				<as:field name="supplierAlternativeAID"/>
+				<as:field name="thumbnail"/>
+				<as:field name="unit"/>
+				<as:field name="xmlcontent"/>
+				<as:field name="comments"/>
+				<as:field name="creationtime">
+					<as:editor-parameter>
+						<as:name>equalsComparesExactDate</as:name>
+						<as:value>true</as:value>
+					</as:editor-parameter>
+					<as:editor-parameter>
+						<as:name>comparesExactDate</as:name>
+						<as:value>true</as:value>
+					</as:editor-parameter>
+				</as:field>
+				<as:field name="modifiedtime">
+					<as:editor-parameter>
+						<as:name>equalsComparesExactDate</as:name>
+						<as:value>true</as:value>
+					</as:editor-parameter>
+					<as:editor-parameter>
+						<as:name>comparesExactDate</as:name>
+						<as:value>true</as:value>
+					</as:editor-parameter>
+				</as:field>
+				<as:field name="pk" editor="com.hybris.cockpitng.editor.defaultlong"/>
+			</as:field-list>
+		</as:advanced-search>
+	</context>
+
+     <context merge-by="type" parent="GenericItem" type="Product" component="advanced-search">
+        <advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch">
+            <advanced-search:field-list/>
+        </advanced-search:advanced-search>
+    </context>
+
+    <context type="Product" component="pcmbackoffice-listviewactions">
+		<y:actions>
+			<y:group qualifier="common" show-group-header="false" position="10">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.create" property="selectionContext" position="10">
+					<y:parameter>
+						<yc:name>triggerContext</yc:name>
+						<yc:value>pcmbackoffice</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>createdTypeKey</yc:name>
+						<yc:value>pageable.typeCode</yc:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.cockpitng.action.delete" property="selectedObjects"
+						  triggerOnKeys="#del" position="20"/>
+				<y:action action-id="com.hybris.cockpitng.action.edit" property="selectedObjects"
+						  triggerOnKeys="^e" position="30">
+					<y:parameter>
+						<yc:name>forwardSelectionToSocket</yc:name>
+						<yc:value>selectedItemsToEdit</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>forwardSelectionAs</yc:name>
+						<yc:value>list</yc:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.cockpitng.action.clone" property="selectedObjects" position="40"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.sync" property="selectedObjects"
+						  position="50"/>
+			</y:group>
+			<y:group qualifier="bulk" show-group-header="false" position="20">
+				<y:action action-id="com.hybris.cockpitng.action.message" property="selectedObjects"
+						  triggerOnKeys="^c" position="10">
+					<y:parameter>
+						<yc:name>actionName</yc:name>
+						<yc:value>label.compareview.action.compareitems</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>message</yc:name>
+						<yc:value>#root</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>socket</yc:name>
+						<yc:value>selectedItemsToCompare</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>enabled</yc:name>
+						<yc:value>#root?.size() > 1</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>iconUri</yc:name>
+						<yc:value>/widgetClasspathResource/widgets/compare/images/Compare_default.png</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>iconHoverUri</yc:name>
+						<yc:value>/widgetClasspathResource/widgets/compare/images/Compare_hover.png</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>iconDisabledUri</yc:name>
+						<yc:value>/widgetClasspathResource/widgets/compare/images/Compare_inactive.png</yc:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.bulkedit" property="selectedObjects"
+						  position="20 "/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.enumeration" property="selectedObjects"
+						  position="30">
+					<y:parameter>
+						<yc:name>qualifier</yc:name>
+						<yc:value>approvalStatus</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>actionName</yc:name>
+						<yc:value>bulk.approval</yc:value>
+					</y:parameter>
+				</y:action>
+			</y:group>
+			<y:extended-group qualifier="export" show-group-header="false" position="30">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.excel.export" property="pageable.typeCode"
+						  position="10"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.excel.exporttemplate"
+						  property="pageable.typeCode" position="20"/>
+				<y:action action-id="com.hybris.cockpitng.listview.action.export.csv" property="exportColumnsAndData"
+						  position="30">
+					<y:parameter>
+						<yc:name>actionName</yc:name>
+						<yc:value>label.export.csv</yc:value>
+					</y:parameter>
+				</y:action>
+				<y:extended-action action-id="com.hybris.backoffice.widgets.actions.excel.export"/>
+			</y:extended-group>
+			<y:group qualifier="import" show-group-header="false" show-separator="false" position="40">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.excel.import" property="pageable.typeCode"/>
+			</y:group>
+		</y:actions>
+	</context>
+	<context type="Product" component="pcmbackoffice-listviewactions" source="quicklist">
+		<y:actions>
+			<y:group qualifier="common" show-group-header="false" position="10">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.delete" property="selectedObjects"
+						  triggerOnKeys="#del" position="20"/>
+				<y:action action-id="com.hybris.cockpitng.action.edit" property="selectedObjects"
+						  triggerOnKeys="^e" position="30">
+					<y:parameter>
+						<yc:name>forwardSelectionToSocket</yc:name>
+						<yc:value>selectedItemsToEdit</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>forwardSelectionAs</yc:name>
+						<yc:value>list</yc:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.sync" property="selectedObjects"
+						  position="50"/>
+			</y:group>
+			<y:group qualifier="bulk" show-group-header="false" position="20">
+				<y:action action-id="com.hybris.cockpitng.action.message" property="selectedObjects"
+						  triggerOnKeys="^c" position="10">
+					<y:parameter>
+						<yc:name>actionName</yc:name>
+						<yc:value>label.compareview.action.compareitems</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>message</yc:name>
+						<yc:value>#root</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>socket</yc:name>
+						<yc:value>selectedItemsToCompare</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>enabled</yc:name>
+						<yc:value>#root?.size() > 1</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>iconUri</yc:name>
+						<yc:value>/widgetClasspathResource/widgets/compare/images/Compare_default.png</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>iconHoverUri</yc:name>
+						<yc:value>/widgetClasspathResource/widgets/compare/images/Compare_hover.png</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>iconDisabledUri</yc:name>
+						<yc:value>/widgetClasspathResource/widgets/compare/images/Compare_inactive.png</yc:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.bulkedit" property="selectedObjects"
+						  position="20 "/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.enumeration" property="selectedObjects"
+						  position="30">
+					<y:parameter>
+						<yc:name>qualifier</yc:name>
+						<yc:value>approvalStatus</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>actionName</yc:name>
+						<yc:value>bulk.approval</yc:value>
+					</y:parameter>
+				</y:action>
+			</y:group>
+			<y:extended-group qualifier="export" show-group-header="false" position="30">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.excel.export" property="pageable.typeCode"
+						  position="10"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.excel.exporttemplate"
+						  property="pageable.typeCode" position="20"/>
+				<y:action action-id="com.hybris.cockpitng.listview.action.export.csv" property="exportColumnsAndData"
+						  position="30">
+					<y:parameter>
+						<yc:name>actionName</yc:name>
+						<yc:value>label.export.csv</yc:value>
+					</y:parameter>
+				</y:action>
+				<y:extended-action action-id="com.hybris.backoffice.widgets.actions.excel.export"/>
+			</y:extended-group>
+			<y:group qualifier="import" show-group-header="false" show-separator="false" position="40">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.excel.import" property="pageable.typeCode"/>
+			</y:group>
+			<y:group qualifier="remove" show-group-header="false" show-separator="false" position="50">
+				<y:action action-id="com.hybris.pcmbackoffice.action.removelist.removequicklist" property="selectedObjects"/>
+			</y:group>
+		</y:actions>
+	</context>
+	<context type="Product" component="pcmbackoffice-listviewactions" source="blockedlist">
+		<y:actions>
+			<y:group qualifier="common" show-group-header="false" position="10">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.delete" property="selectedObjects"
+						  triggerOnKeys="#del" position="20"/>
+				<y:action action-id="com.hybris.cockpitng.action.edit" property="selectedObjects"
+						  triggerOnKeys="^e" position="30">
+					<y:parameter>
+						<yc:name>forwardSelectionToSocket</yc:name>
+						<yc:value>selectedItemsToEdit</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>forwardSelectionAs</yc:name>
+						<yc:value>list</yc:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.sync" property="selectedObjects"
+						  position="50"/>
+			</y:group>
+			<y:group qualifier="bulk" show-group-header="false" position="20">
+				<y:action action-id="com.hybris.cockpitng.action.message" property="selectedObjects"
+						  triggerOnKeys="^c" position="10">
+					<y:parameter>
+						<yc:name>actionName</yc:name>
+						<yc:value>label.compareview.action.compareitems</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>message</yc:name>
+						<yc:value>#root</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>socket</yc:name>
+						<yc:value>selectedItemsToCompare</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>enabled</yc:name>
+						<yc:value>#root?.size() > 1</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>iconUri</yc:name>
+						<yc:value>/widgetClasspathResource/widgets/compare/images/Compare_default.png</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>iconHoverUri</yc:name>
+						<yc:value>/widgetClasspathResource/widgets/compare/images/Compare_hover.png</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>iconDisabledUri</yc:name>
+						<yc:value>/widgetClasspathResource/widgets/compare/images/Compare_inactive.png</yc:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.bulkedit" property="selectedObjects"
+						  position="20 "/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.enumeration" property="selectedObjects"
+						  position="30">
+					<y:parameter>
+						<yc:name>qualifier</yc:name>
+						<yc:value>approvalStatus</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>actionName</yc:name>
+						<yc:value>bulk.approval</yc:value>
+					</y:parameter>
+				</y:action>
+			</y:group>
+			<y:extended-group qualifier="export" show-group-header="false" position="30">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.excel.export" property="pageable.typeCode"
+						  position="10"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.excel.exporttemplate"
+						  property="pageable.typeCode" position="20"/>
+				<y:action action-id="com.hybris.cockpitng.listview.action.export.csv" property="exportColumnsAndData"
+						  position="30">
+					<y:parameter>
+						<yc:name>actionName</yc:name>
+						<yc:value>label.export.csv</yc:value>
+					</y:parameter>
+				</y:action>
+				<y:extended-action action-id="com.hybris.backoffice.widgets.actions.excel.export"/>
+			</y:extended-group>
+			<y:group qualifier="import" show-group-header="false" show-separator="false" position="40">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.excel.import" property="pageable.typeCode"/>
+			</y:group>
+			<y:group qualifier="remove" show-group-header="false" show-separator="false" position="50">
+				<y:action action-id="com.hybris.pcmbackoffice.action.removelist.removeblockedlist" property="selectedObjects"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="Product" component="pcmbackoffice-assortment-listviewactions">
+		<y:actions>
+			<y:group qualifier="common" position="10">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.create" property="selectionContext" position="10">
+					<y:parameter>
+						<yc:name>triggerContext</yc:name>
+						<yc:value>pcmbackoffice</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>createdTypeKey</yc:name>
+						<yc:value>pageable.typeCode</yc:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.cockpitng.action.delete" property="selectedObjects"
+						  triggerOnKeys="#del" position="20"/>
+				<y:action action-id="com.hybris.cockpitng.action.edit" property="selectedObjects"
+						  triggerOnKeys="^e" position="30">
+					<y:parameter>
+						<yc:name>forwardSelectionToSocket</yc:name>
+						<yc:value>selectedItemsToEdit</yc:value>
+					</y:parameter>
+					<y:parameter>
+						<yc:name>forwardSelectionAs</yc:name>
+						<yc:value>list</yc:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.sync" property="selectedObjects"
+						  position="40"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+    <context component="pcmbackoffice-quick-list" type="Product">
+		<ql:quick-list display-preview="true"
+					   default-image="cng/img/default/grid_view_default_preview.png">
+			<ql:attribute qualifier="catalogVersion"/>
+			<ql:attribute qualifier="code"/>
+			<ql:attribute qualifier="name"/>
+		</ql:quick-list>
+	</context>
+
+    <import resource="classificationgroups-config/classificationgroups-backoffice-config.xml" />
+</config>
