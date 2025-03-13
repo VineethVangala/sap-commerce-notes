@@ -1,0 +1,154 @@
+$contentCatalog=apparel-deContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+
+# Import modulegen config properties into impex macros
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+$jarResourceCms=$config-jarResourceCmsValue
+
+# Create PageTemplates
+# These define the layout for pages
+# "FrontendTemplateName" is used to define the JSP that should be used to render the page for pages with multiple possible layouts.
+# "RestrictedPageTypes" is used to restrict templates to page types
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;ProductDetailsPageTemplate;Product Details Page Template;product/productLayout1Page;ProductPage
+;;SearchResultsListPageTemplate;Search Results List Page Template;search/searchListPage;ContentPage
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;ProductDetailsPageTemplate;$jarResourceCms/structure-view/structure_productDetails1PageTemplate.vm
+;;SearchResultsListPageTemplate ;$jarResourceCms/structure-view/structure_searchResultsListPageTemplate.vm
+
+# Product Details Page Template
+# The CrossSelling and UpSelling slots are designed for related products, cross-sells and up-sells.
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ProductDetailsPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Section1;;;wide
+;Section2;;;wide
+;Section3;;;wide
+;Section4;;;wide
+;VariantSelector;;ProductVariantSelectorComponent;narrow
+;AddToCart;;ProductAddToCartComponent;narrow
+;CrossSelling;;ProductReferencesComponent;narrow
+;UpSelling;;ProductReferencesComponent;wide
+;Footer;;;footer
+;Tabs;;CMSTabParagraphContainer
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;PlaceholderContentSlot;;;
+
+
+# Create ContentSlots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;SiteLogoSlot;Default Site Logo Slot;true
+;;HomepageNavLinkSlot;Default Homepage Link;true
+;;MiniCartSlot;Mini Cart;true
+;;NavigationBarSlot;Navigation Bar;true
+;;TabsSlot;Tabs;true
+;;TopContentSlot;Top Content;true
+;;SideContentSlot;Side Content;true
+;;BottomContentSlot;Bottom Content;true
+;;FeatureContentSlot;Feature Content;true
+;;FooterSlot;Footer;true
+;;HeaderLinksSlot;Header links;true
+;;SearchBoxSlot;Search Box;true
+;;VariantSelectorSlot;Variant Selector;true
+;;AddToCartSlot;Add To Cart;true
+;;UpSellingSlot;Up Selling;true
+;;CrossSellingSlot;Cross Selling;true
+;;TopHeaderSlot;Top Header;true
+;;BottomHeaderSlot;Bottom Header;true
+;;ProductLeftRefinements;Refinements;true
+;;ProductGridSlot;Product List;true
+;;ProductListSlot;Product Grid;true
+;;SearchResultsListSlot;Search Result List;true
+;;SearchResultsGridSlot;Search Result Grid;true
+;;MiddleContentSlot;Middle Content Slot;true
+;;LeftContentSlot;Left Content Slot;true
+;;RightContentSlot;Right Content Slot;true
+;;CenterContentSlot;Center Content Slot;true
+;;CenterLeftContentSlot;Center Left Content Slot;true
+;;CenterRightContentSlot;Center Right Content Slot;true
+;;EmptyCartMiddleContent;Empty CartMiddle Content Slot;true
+;;PlaceholderContentSlot;Placeholder for Addon tag files;true
+
+# Bind Content Slots to Page Templates
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ProductDetailsPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ProductDetails;SiteLogo;;SiteLogoSlot;true
+;;HomepageLink-ProductDetails;HomepageNavLink;;HomepageNavLinkSlot;true
+;;MiniCart-ProductDetails;MiniCart;;MiniCartSlot;true
+;;NavigationBar-ProductDetails;NavigationBar;;NavigationBarSlot;true
+;;Tabs-ProductDetails;Tabs;;TabsSlot;true
+;;Footer-ProductDetails;Footer;;FooterSlot;true
+;;HeaderLinks-ProductDetails;HeaderLinks;;HeaderLinksSlot;true
+;;SearchBox-ProductDetails;SearchBox;;SearchBoxSlot;true
+;;VariantSelector-ProductDetails;VariantSelector;;VariantSelectorSlot;true
+;;AddToCart-ProductDetails;AddToCart;;AddToCartSlot;true
+;;UpSelling-ProductDetails;UpSelling;;UpSellingSlot;true
+;;CrossSelling-ProductDetails;CrossSelling;;CrossSellingSlot;true
+;;TopHeaderSlot-ProductDetails;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeaderSlot-ProductDetails;BottomHeaderSlot;;BottomHeaderSlot;true
+;;PlaceholderContentSlot-ProductDetails;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+# Product Details Page
+INSERT_UPDATE ProductPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;productDetails;Product Details;ProductDetailsPageTemplate;true;
+
+#####################################################################################################################################
+
+# Search Results List Page Template
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='SearchResultsListPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;ProductLeftRefinements;;;narrow
+;SearchResultListSlot;;;wide
+;Footer;;;footer
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;PlaceholderContentSlot;;;
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='SearchResultsListPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-SearchResultsList;SiteLogo;;SiteLogoSlot;true
+;;HomepageLink-SearchResultsList;HomepageNavLink;;HomepageNavLinkSlot;true
+;;MiniCart-SearchResultsList;MiniCart;;MiniCartSlot;true
+;;NavigationBar-SearchResultsList;NavigationBar;;NavigationBarSlot;true
+;;Footer-SearchResultsList;Footer;;FooterSlot;true
+;;HeaderLinks-SearchResultsList;HeaderLinks;;HeaderLinksSlot;true
+;;SearchBox-SearchResultsList;SearchBox;;SearchBoxSlot;true
+;;TopHeaderSlot-SearchResultsList;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeaderSlot-SearchResultsList;BottomHeaderSlot;;BottomHeaderSlot;true
+;;ProductLeftRefinements-SearchResultsList;ProductLeftRefinements;;ProductLeftRefinements;true
+;;SearchResultsListSlot-SearchResultsList;SearchResultsListSlot;;SearchResultsListSlot;true
+;;PlaceholderContentSlot-SearchResultsList;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+# SimpleBannerComponent 
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;;;;
+;;BuyOnlineSimpleBannerComponent;Buy Online Simple Banner Component;BuyOnlineSimpleBannerComponent;;;;
+
+INSERT_UPDATE SearchResultsListComponent;$contentCV[unique=true];uid[unique=true];name;actions(uid,$contentCV);&componentRef
+;;SearchResultsList;Search Result List Component;ListPickUpInStoreAction,ListAddToCartAction;SearchResultsList
+
+INSERT_UPDATE SearchResultsGridComponent;$contentCV[unique=true];uid[unique=true];name;actions(uid,$contentCV);&componentRef
+;;SearchResultsGrid;Search Result Grid Component;ListPickUpInStoreAction,ListAddToCartAction;SearchResultsGrid
+
+#### SearchResultListPage
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SearchResultsListSlot;Search Result List Slot for Search List;true;SearchResultsList;;;
+
+# ContentSlot 
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;Section2Slot-search;Section2 Slot for Search Page;true;BuyOnlineSimpleBannerComponent;;;
+ 
+# ContentSlotForPage 
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='search'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section2-search;Section2;;Section2Slot-search;;;
+
+# Content Pages
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)[default='ContentPageModel__function_preview']
+;;search;Search Results Page;SearchResultsGridPageTemplate;search

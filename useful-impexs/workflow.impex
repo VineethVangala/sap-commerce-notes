@@ -1,0 +1,242 @@
+# -----------------------------------------------------------------------
+# Copyright (c) 2021 SAP SE or an SAP affiliate company. All rights reserved.
+# -----------------------------------------------------------------------
+
+$lang=en
+
+$dummyUserName=admin;
+$adhocTempateName=adhoctemplate;
+
+$adhocStepName=Adhoc step;
+$adhocApprovalStepName=Approval;
+$adhocEndStepName=End
+$doneName=Done;
+$approvedName=Approved;
+$notApprovedName=Not approved;
+$endName=End
+
+
+# import special (simple) template for creating adhoc workflows:
+INSERT_UPDATE WorkflowTemplate;code[unique=true];name[lang=$lang];description[lang=$lang];owner(User.uid);
+;$adhocTempateName;Adhoc template;Template with one simple tasks;$dummyUserName;
+
+# add two simple steps to adhoc template 
+## step one
+INSERT_UPDATE WorkflowActionTemplate;code[unique=true];name[lang=$lang];principalAssigned(User.uid);owner(User.uid);workflow(WorkflowTemplate.code);actionType(code)
+;$adhocStepName;Start;$dummyUserName;$dummyUserName;$adhocTempateName;start
+
+## step two
+INSERT_UPDATE WorkflowActionTemplate;code[unique=true];name[lang=$lang];principalAssigned(User.uid);owner(User.uid);workflow(WorkflowTemplate.code);actionType(code)
+;$adhocApprovalStepName;Approval;$dummyUserName;$dummyUserName;$adhocTempateName;normal
+
+#decisions for first step
+INSERT_UPDATE WorkflowDecisionTemplate;code[unique=true];name[lang=$lang];actionTemplate(WorkflowActionTemplate.code);
+;$doneName;Done!;$adhocStepName;
+
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation;source(WorkflowDecisionTemplate.code)[unique=true];target(WorkflowActionTemplate.code)
+;$doneName;$adhocApprovalStepName
+
+#decisions for second step
+INSERT_UPDATE WorkflowDecisionTemplate;code[unique=true];name[lang=$lang];actionTemplate(WorkflowActionTemplate.code);
+;$approvedName;Approval;$adhocApprovalStepName;
+INSERT_UPDATE WorkflowDecisionTemplate;code[unique=true];name[lang=$lang];actionTemplate(WorkflowActionTemplate.code);
+;$notApprovedName;No Approval;$adhocApprovalStepName;
+
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation;source(WorkflowDecisionTemplate.code)[unique=true];target(WorkflowActionTemplate.code)
+;$notApprovedName;$adhocStepName
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation;source(WorkflowDecisionTemplate.code)[unique=true];target(WorkflowActionTemplate.code)
+;$approvedName;$adhocEndStepName
+
+## step three - final
+INSERT_UPDATE WorkflowActionTemplate;code[unique=true];name[lang=$lang];principalAssigned(User.uid);owner(User.uid);workflow(WorkflowTemplate.code);actionType(code)
+;$adhocEndStepName;End;$dummyUserName;$dummyUserName;$adhocTempateName;end
+
+#decisions for third step
+INSERT_UPDATE WorkflowDecisionTemplate;code[unique=true];name[lang=$lang];actionTemplate(WorkflowActionTemplate.code);
+;$endName;End;$adhocEndStepName;
+
+#####################################################################################################################################
+
+$pageApprovalTemplateName=PageApproval
+$userGroupsInWorkflow=cmsreviewergroup,cmseditorgroup,cmspublishergroup
+
+INSERT_UPDATE Language;isocode[unique=true];active
+;en;true
+
+# Creating user groups needed for workflow (They will be configured further in smarteditaddon).
+INSERT_UPDATE UserGroup;UID[unique=true];groups(uid)[mode=append]
+;cmsworkflowgroup;basecmsmanagergroup
+;cmseditorgroup;cmsworkflowgroup
+;cmsreviewergroup;cmsworkflowgroup
+;cmspublishergroup;cmsworkflowgroup
+
+# Access rights for workflow users - Needed to be able to create WorkflowActionTemplates
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;cmsworkflowgroup;basecmsmanagergroup,employeegroup;;;;;;;
+
+# workflow items
+;;;;Workflow;+;+;-;-;-;
+;;;;WorkflowAction;+;+;;;;
+;;;;Comment;+;+;+;+;;
+;;;;CMSWorkflowComment;+;+;+;+;;
+
+$END_USERRIGHTS;;;;;
+
+# Create workflow
+INSERT_UPDATE WorkflowTemplate; code[unique=true] ; name[lang=en] ; description[lang=en] ; visibleForPrincipals(uid)[mode=append];
+;$pageApprovalTemplateName ;Page Approval ;This workflow is used to approve and publish CMS Pages ;$userGroupsInWorkflow ;
+
+
+INSERT_UPDATE WorkflowActionTemplate;code[unique = true] ;name[lang = en] ;description[lang = en] ;principalAssigned(uid) ;workflow(code)[unique = true] ;sendEmail ;actionType(code) ;
+;PageApprovalReviewPage  ;Review Page       ;Review page to ensure it is ready to be published ;cmsreviewergroup  ;$pageApprovalTemplateName ;false ;start ;
+;PageApprovalRevisePage  ;Revise Page       ;Revise page to address review comments            ;cmseditorgroup    ;$pageApprovalTemplateName ;false ;normal ;
+;PageApprovalPublishPage ;Publish Page      ;Publish page to active catalog                    ;cmspublishergroup ;$pageApprovalTemplateName ;false ;normal ;
+;PageApprovalEnd         ;Done              ;Workflow finished                                 ;cmseditorgroup    ;$pageApprovalTemplateName ;false ;end ;
+
+
+INSERT_UPDATE AutomatedWorkflowActionTemplate; code[unique = true]; name[lang = en]; description[lang = en]; principalAssigned(uid); workflow(code)[unique = true]; sendEmail; emailAddress; rendererTemplate(code); actionType(code); jobHandler
+;PageApprovalAutomatedUpdateApprovalStatusAction 	;Automated Update Approval Status Action	;Auto-action to update the page approval status 	;cmsworkflowgroup ;$pageApprovalTemplateName ;false ;;;normal ;approvePageAutomatedWorkflowAction
+
+
+INSERT_UPDATE WorkflowDecisionTemplate;code[unique = true] ;name[lang = en] ;actionTemplate(code) ;description[allownull = true] ;
+;PageApprovalPageApproved    								;Approve  		;PageApprovalReviewPage   									;Page is correct and ready to be published
+;PageApprovalAutomatedUpdateApprovalStatusDecision	;Post Approve 	;PageApprovalAutomatedUpdateApprovalStatusAction 	;Automated decision after approving review
+;PageApprovalPageRejected    								;Reject  		;PageApprovalReviewPage  									;Page needs to be reworked
+;PageApprovalPageResubmitted 								;Resubmit 		;PageApprovalRevisePage  									;Submit page again for approval
+;PageApprovalPagePublished   								;Publish  		;PageApprovalPublishPage 									;Publish Page
+
+
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation;source(code)[unique = true] ;target(code)[unique = true] ;andConnectionTemplate ;qualifier ;
+;PageApprovalPageApproved    								;PageApprovalAutomatedUpdateApprovalStatusAction 	;false ;WorkflowActionTemplateLinkTemplateRelation
+;PageApprovalAutomatedUpdateApprovalStatusDecision	;PageApprovalPublishPage 									;false ;WorkflowActionTemplateLinkTemplateRelation
+;PageApprovalPageRejected    								;PageApprovalRevisePage  									;false ;WorkflowActionTemplateLinkTemplateRelation
+;PageApprovalPageResubmitted 								;PageApprovalReviewPage  									;false ;WorkflowActionTemplateLinkTemplateRelation
+;PageApprovalPagePublished									;PageApprovalEnd						         			;false ;WorkflowActionTemplateLinkTemplateRelation
+
+#####################################################################################################################################
+
+$pageTranslationTemplateName=PageTranslation
+$userGroupsInWorkflow=cmsreviewergroup,cmseditorgroup,cmspublishergroup,basecmstranslatorgroup
+
+INSERT_UPDATE Language;isocode[unique=true];active
+;en;true
+
+# Creating user groups needed for workflow (They will be configured further in smarteditaddon).
+INSERT_UPDATE UserGroup;UID[unique=true];groups(uid)[mode=append]
+;cmsworkflowgroup;basecmsmanagergroup
+;cmseditorgroup;cmsworkflowgroup
+;cmsreviewergroup;cmsworkflowgroup
+;cmspublishergroup;cmsworkflowgroup
+;basecmstranslatorgroup;cmsworkflowgroup
+;cmstranslatorgroup;cmsworkflowgroup
+;cmstranslatorgroup-DE;cmsworkflowgroup
+;cmstranslatorgroup-ZH;cmsworkflowgroup
+;cmstranslatorgroup-JP;cmsworkflowgroup
+
+# Access rights for workflow users - Needed to be able to create WorkflowActionTemplates
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;cmsworkflowgroup;;;;;;;;
+
+;;;;Workflow;+;+;-;-;-;
+;;;;WorkflowAction;+;+;;;;
+;;;;Comment;+;+;+;+;;
+;;;;CMSWorkflowComment;+;+;+;+;;
+
+$END_USERRIGHTS;;;;;
+
+INSERT_UPDATE WorkflowTemplate; code[unique = true]; name[lang = en]; owner(uid); description[lang = en]; visibleForPrincipals(uid)[mode=append];
+; $pageTranslationTemplateName ; Page Translation and Approval ; admin ; "This workflow is used to translate, approve and publish CMS Pages" ; $userGroupsInWorkflow ;
+
+# WorkflowActionTemplates for PageTranslationTemplate
+INSERT_UPDATE WorkflowActionTemplate; code[unique = true]; name[lang = en]; description[lang = en]; principalAssigned(uid); workflow(code)[unique = true]; sendEmail; emailAddress; rendererTemplate(code); actionType(code)
+; PageTranslationReviewContent   ; Review Content ; Action for content reviewing ; cmsreviewergroup ; $pageTranslationTemplateName ; false ; ; ; start
+
+; PageTranslationTranslateDE   ; Translate to German ; Action for German language content editing ; cmstranslatorgroup-DE ; $pageTranslationTemplateName ; false ; ; ; normal
+; PageTranslationTranslateZH   ; Translate to Chinese ; Action for Chinese language content editing ; cmstranslatorgroup-ZH ; $pageTranslationTemplateName ; false ; ; ; normal
+; PageTranslationTranslateJP   ; Translate to Japanese ; Action for Japanese language content editing ; cmstranslatorgroup-JP ; $pageTranslationTemplateName ; false ; ; ; normal
+
+; PageTranslationRevisePage ; Revise Page ; Action for page revision ; cmseditorgroup ; $pageTranslationTemplateName ; false ; ; ; normal
+
+; PageTranslationReviewDE   ; Review German Content ; Action for DE content reviewing ; cmsreviewergroup ; $pageTranslationTemplateName ; false ; ; ; normal
+; PageTranslationReviewZH   ; Review Chinese Content ; Action for ZH content reviewing ; cmsreviewergroup ; $pageTranslationTemplateName ; false ; ; ; normal
+; PageTranslationReviewJP   ; Review Japanese Content ; Action for JP content reviewing ; cmsreviewergroup ; $pageTranslationTemplateName ; false ; ; ; normal
+
+; PageTranslationPublish   ; Publish Content ; Action for content publishing ; cmspublishergroup ; $pageTranslationTemplateName ; false ; ; ; normal
+
+; PageTranslationDone   ; Done ; Done ; cmspublishergroup ; $pageTranslationTemplateName ; false ; ; ; end
+
+
+# AutomatedWorkflowActionTemplates for PageTranslationTemplate
+INSERT_UPDATE AutomatedWorkflowActionTemplate; code[unique = true]; name[lang = en]; description[lang = en]; principalAssigned(uid); workflow(code)[unique = true]; sendEmail; emailAddress; rendererTemplate(code); actionType(code); jobHandler
+; PageTranslationAutomatedRejectEditingAction ; Automated Reject Editing Action ; Auto-action when rejecting editing ; cmsworkflowgroup ; $pageTranslationTemplateName ; false ; ; ; normal ; rejectEditingAutomatedWorkflowAction
+; PageTranslationAutomatedUpdateApprovalStatusAction ; Automated Update Approval Status Action; Auto-action to update the page approval status ; cmsworkflowgroup ; $pageTranslationTemplateName ; false ; ; ; normal ; approvePageAutomatedWorkflowAction
+
+
+# WorkflowDecisionTemplates for PageTranslationTemplate actions
+INSERT_UPDATE WorkflowDecisionTemplate; code[unique = true]; name[lang = en]; actionTemplate(code); description[allownull = true]
+; PageTranslationSendForReview ; Send for Review ; PageTranslationRevisePage ; Decision for submitting content for review
+
+; PageTranslationApproveContent ; Approve ; PageTranslationReviewContent ; Decision for approving content
+; PageTranslationSendForTranslation ; Submit for translation ; PageTranslationReviewContent ; Decision for submitting content for translation
+; PageTranslationDeclineContent ; Reject Editing ; PageTranslationReviewContent ; Decision for rejecting content
+
+; PageTranslationSendDEForReview ; Send for Review ; PageTranslationTranslateDE ; Decision for sending DE language for review
+; PageTranslationRejectDEEditing ; Reject Editing ; PageTranslationTranslateDE ; Decision for rejecting editing
+
+; PageTranslationSendZHForReview ; Send for Review ; PageTranslationTranslateZH ; Decision for sending ZH language for review
+; PageTranslationRejectZHEditing ; Reject Editing ; PageTranslationTranslateZH ; Decision for rejecting editing
+
+; PageTranslationSendJPForReview ; Send for Review ; PageTranslationTranslateJP ; Decision for sending JP language for review
+; PageTranslationRejectJPEditing ; Reject Editing ; PageTranslationTranslateJP ; Decision for rejecting editing
+
+; PageTranslationAutomatedRejectEditingDecision ; Post Reject Editing ; PageTranslationAutomatedRejectEditingAction ; Automated decision after rejecting editing
+
+; PageTranslationApproveDE ; Approve ; PageTranslationReviewDE ; Decision for approving DE review
+; PageTranslationDeclineDE ; Reject Translation ; PageTranslationReviewDE ; Decision for rejecting DE review
+
+; PageTranslationApproveZH ; Approve ; PageTranslationReviewZH ; Decision for approving ZH review
+; PageTranslationDeclineZH ; Reject Translation ; PageTranslationReviewZH ; Decision for rejecting ZH review
+
+; PageTranslationApproveJP ; Approve ; PageTranslationReviewJP ; Decision for approving JP review
+; PageTranslationDeclineJP ; Reject Translation ; PageTranslationReviewJP ; Decision for rejecting JP review
+
+; PageTranslationAutomatedUpdateApprovalStatusDecision ; Post Approve ; PageTranslationAutomatedUpdateApprovalStatusAction ; Automated decision after approving review
+
+; PageTranslationPublishContent ; Publish ; PageTranslationPublish ; Decision for publishing content
+
+
+# WorkflowDecisionTemplate - WorkflowActionTemplate relations for PageTranslationTemplate
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation; source(code)[unique = true]; target(code)[unique = true]; andConnectionTemplate; qualifier
+; PageTranslationSendForReview ; PageTranslationReviewContent ; false ; WorkflowActionTemplateLinkTemplateRelation
+
+; PageTranslationSendForTranslation ; PageTranslationTranslateDE ; false ; WorkflowActionTemplateLinkTemplateRelation
+; PageTranslationSendForTranslation ; PageTranslationTranslateZH ; false ; WorkflowActionTemplateLinkTemplateRelation
+; PageTranslationSendForTranslation ; PageTranslationTranslateJP ; false ; WorkflowActionTemplateLinkTemplateRelation
+; PageTranslationApproveContent ; PageTranslationAutomatedUpdateApprovalStatusAction ; false ; WorkflowActionTemplateLinkTemplateRelation
+; PageTranslationDeclineContent ; PageTranslationRevisePage ; false ; WorkflowActionTemplateLinkTemplateRelation
+
+; PageTranslationSendDEForReview ; PageTranslationReviewDE ; false ; WorkflowActionTemplateLinkTemplateRelation
+; PageTranslationRejectDEEditing ; PageTranslationAutomatedRejectEditingAction ; false ; WorkflowActionTemplateLinkTemplateRelation
+
+; PageTranslationSendZHForReview ; PageTranslationReviewZH ; false ; WorkflowActionTemplateLinkTemplateRelation
+; PageTranslationRejectZHEditing ; PageTranslationAutomatedRejectEditingAction ; false ; WorkflowActionTemplateLinkTemplateRelation
+
+; PageTranslationSendJPForReview ; PageTranslationReviewJP ; false ; WorkflowActionTemplateLinkTemplateRelation
+; PageTranslationRejectJPEditing ; PageTranslationAutomatedRejectEditingAction ; false ; WorkflowActionTemplateLinkTemplateRelation
+
+; PageTranslationAutomatedRejectEditingDecision ; PageTranslationRevisePage ; false ; WorkflowActionTemplateLinkTemplateRelation
+
+; PageTranslationApproveDE ; PageTranslationAutomatedUpdateApprovalStatusAction ; true ; WorkflowActionTemplateLinkTemplateRelation
+; PageTranslationDeclineDE ; PageTranslationTranslateDE ; false ; WorkflowActionTemplateLinkTemplateRelation
+
+; PageTranslationApproveZH ; PageTranslationAutomatedUpdateApprovalStatusAction ; true ; WorkflowActionTemplateLinkTemplateRelation
+; PageTranslationDeclineZH ; PageTranslationTranslateZH ; false ; WorkflowActionTemplateLinkTemplateRelation
+
+; PageTranslationApproveJP ; PageTranslationAutomatedUpdateApprovalStatusAction ; true ; WorkflowActionTemplateLinkTemplateRelation
+; PageTranslationDeclineJP ; PageTranslationTranslateJP ; false ; WorkflowActionTemplateLinkTemplateRelation
+
+; PageTranslationAutomatedUpdateApprovalStatusDecision ; PageTranslationPublish ; false ; WorkflowActionTemplateLinkTemplateRelation
+
+; PageTranslationPublishContent ; PageTranslationDone ; false ; WorkflowActionTemplateLinkTemplateRelation
