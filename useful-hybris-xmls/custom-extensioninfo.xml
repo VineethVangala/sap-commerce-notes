@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
+--><extensioninfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="extensioninfo.xsd">
+    	
+    <extension abstractclassprefix="Generated" classprefix="AcceleratorFacades" name="acceleratorfacades" usemaven="false">
+        		
+        <requires-extension name="acceleratorcms"/>
+        		
+        <requires-extension name="commercefacades"/>
+        		
+        <requires-extension name="cmsfacades"/>
+        		
+        <coremodule generated="true" manager="de.hybris.platform.jalo.extension.GenericManager" packageroot="de.hybris.platform.acceleratorfacades"/>
+        	
+    </extension>
+    
+</extensioninfo>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
+--><extensioninfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="extensioninfo.xsd">
+    	
+    <extension abstractclassprefix="Generated" classprefix="AcceleratorServices" managername="AcceleratorServicesManager" managersuperclass="de.hybris.platform.jalo.extension.Extension" name="acceleratorservices" usemaven="false">
+        		
+        <requires-extension name="cms2"/>
+        		
+        <requires-extension name="commerceservices"/>
+        		
+        <requires-extension name="ticketsystem"/>
+        		
+        <requires-extension name="springintegrationlibs"/>
+        		
+        <coremodule generated="true" manager="de.hybris.platform.acceleratorservices.jalo.AcceleratorServicesManager" packageroot="de.hybris.platform.acceleratorservices"/>
+        		
+        <webmodule jspcompile="false" webroot="/acceleratorservices"/>
+        	
+    </extension>
+    
+</extensioninfo>
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
+--><extensioninfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="extensioninfo.xsd">
+    	
+    <extension abstractclassprefix="Generated" classprefix="YAcceleratorStorefront" name="yacceleratorstorefront" usemaven="false">
+        		
+        
+        <requires-extension name="acceleratorstorefrontcommons"/>
+        		
+        <requires-extension name="yacceleratorfacades"/>
+        		
+        <webmodule jspcompile="false" webroot="/yacceleratorstorefront"/>
+        		
+        <meta key="modulegen-name" value="accelerator"/>
+        		
+        <meta key="extgen-template-extension" value="true"/>
+        	
+    </extension>
+    
+</extensioninfo>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ Copyright (c) 2021 SAP SE or an SAP affiliate company. All rights reserved.
+--><extensioninfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="extensioninfo.xsd">
+    	
+    <extension name="maintenanceweb" usemaven="false">
+        		
+        <requires-extension name="core"/>
+        		
+		
+        <webmodule jspcompile="true" webroot="/maintenance"/>
+        						
+	
+    </extension>
+    
+</extensioninfo>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<extensioninfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="extensioninfo.xsd">
+    	
+    <extension abstractclassprefix="Generated" classprefix="Ycommercewebservices" name="ycommercewebservices" usemaven="false">
+        		
+        <requires-extension name="commercefacades"/>
+        		
+        <requires-extension name="commercewebservicescommons"/>
+        		
+        <requires-extension name="ordermanagementfacades"/>
+        		
+        <coremodule generated="true" manager="de.hybris.platform.jalo.extension.GenericManager" packageroot="de.hybris.platform.ycommercewebservices"/>
+        		
+        <webmodule jspcompile="false" webroot="/rest"/>
+        		
+        <meta key="extgen-template-extension" value="true"/>
+        		
+        <meta key="modulegen-name" value="commercewebservices"/>
+        	
+    </extension>
+    
+</extensioninfo>
