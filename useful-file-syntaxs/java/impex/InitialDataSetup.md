@@ -1,5 +1,17 @@
 # Custom Setup class for Essential and Project Data import by Code
 
+Refer : [SAP Commerce 123 | Essential and Project Data by Code](https://help.sap.com/docs/SAP_COMMERCE_CLOUD_PUBLIC_CLOUD/d97b2ab46fde43a78640036ebf68e106/02b4f9d4ba0740eabec09508a293e25e.html)
+
+### Summary
+
+|                                        |                                                 |
+| -------------------------------------- | ----------------------------------------------- |
+| extends                                |                                                 |
+| implements                             |                                                 |
+| Setup class annotation                 | @SystemSetup(extension = "concerttours")        |
+| Essential Data setup method annotation | @SystemSetup(type = SystemSetup.Type.ESSENTIAL) |
+| Project Data setup method annotation   | @SystemSetup(type = SystemSetup.Type.PROJECT)   |
+
 ### Example
 
 1. Create a setup class called ConcerttoursCustomSetup.java in your <HYBRIS_HOME_DIR>/hybris/bin/custom/concerttours/src/concerttours/setup folder.
