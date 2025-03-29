@@ -1,5 +1,3 @@
-# items.xml Syntax
-
 ## Available Types
 
 | Type            | Description / Comment                                                                                                                                                                                                                                                                                                                              | unique identifier | Database storage                                                                                                 | Examples                                                                       |
