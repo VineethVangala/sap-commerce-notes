@@ -48,6 +48,7 @@ public class BandAlbumSalesInterceptor implements ValidateInterceptor, PrepareIn
     @Override
     public void onPrepare(final Object model, final InterceptorContext ctx) throws InterceptorException
     {
+        //ctx.getDirtyAttributes()
         if (model instanceof BandModel)
         {
             final BandModel band = (BandModel) model;

@@ -4,12 +4,11 @@ Refer: [SAP Commerce 123 | Dynamic Attributes](https://help.sap.com/docs/SAP_COM
 
 ### Summary
 
-|                   |                                                          |
-| ----------------- | -------------------------------------------------------- |
-| **extends**       | AbstractDynamicAttributeHandler<RETURN_TYPE, MODEL_TYPE> |
-| implements        |                                                          |
-| override method 1 | **get** (final MODEL_TYPE model)                         |
-| override method 2 | **set** (final MODEL_TYPE model,final Object value)      |
+|                  |                                                                                          |
+| ---------------- | ---------------------------------------------------------------------------------------- |
+| **extends**      | AbstractDynamicAttributeHandler<RETURN_TYPE, MODEL_TYPE>                                 |
+| implements       |                                                                                          |
+| override methods | **get** (final MODEL_TYPE model)<br> **set** (final MODEL_TYPE model,final Object value) |
 
 ### Example
 
