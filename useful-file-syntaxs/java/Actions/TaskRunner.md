@@ -1,3 +1,11 @@
+### Summary
+
+|                     |                                                                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| extends             |                                                                                                                                        |
+| **implements**      | TaskRunner<TaskModel>                                                                                                                  |
+| **override method** | void **run**(TaskService taskService, TaskModel task) <br> void handleError( TaskService taskService, TaskModel task, Throwable error) |
+
 ```java
 public class MyTaskRunner implements TaskRunner<TaskModel>
 {

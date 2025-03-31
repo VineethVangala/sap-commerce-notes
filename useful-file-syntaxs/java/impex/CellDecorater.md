@@ -2,11 +2,11 @@
 
 ### Summary
 
-|                  |                                                                      |
-| ---------------- | -------------------------------------------------------------------- |
-| **extends**      | AbstractImpExCSVCellDecorator implements CSVCellDecorator            |
-| implements       | CSVCellDecorator                                                     |
-| override methods | **decorate**(final int position, final Map<Integer, String> srcLine) |
+|                  |                                                                             |
+| ---------------- | --------------------------------------------------------------------------- |
+| **extends**      | AbstractImpExCSVCellDecorator implements CSVCellDecorator                   |
+| implements       | CSVCellDecorator                                                            |
+| override methods | String **decorate**(final int position, final Map<Integer, String> srcLine) |
 
 ### Syntax
 

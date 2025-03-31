@@ -2,11 +2,11 @@
 
 ### Summary
 
-|                 |                                                 |
-| --------------- | ----------------------------------------------- |
-| **extends**     | AbstractEvent                                   |
-| **implements**  | **ClusterAwareEvent**                           |
-| override method | **publish**(int sourceNodeId, int targetNodeId) |
+|                 |                                                         |
+| --------------- | ------------------------------------------------------- |
+| **extends**     | AbstractEvent                                           |
+| **implements**  | **ClusterAwareEvent**                                   |
+| override method | boolean **publish**(int sourceNodeId, int targetNodeId) |
 
 ### Example
 

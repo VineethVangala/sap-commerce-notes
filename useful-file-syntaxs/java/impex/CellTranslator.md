@@ -2,11 +2,11 @@
 
 ### Summary
 
-|                  |                                                                                                     |
-| ---------------- | --------------------------------------------------------------------------------------------------- |
-| **extends**      | AbstractValueTranslator                                                                             |
-| implements       |                                                                                                     |
-| override methods | **importValue**(final String valueExpr, final Item toItem) <br> **exportValue**(final Object value) |
+|                  |                                                                                                                   |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **extends**      | AbstractValueTranslator                                                                                           |
+| implements       |                                                                                                                   |
+| override methods | Object **importValue**(final String valueExpr, final Item toItem) <br> String **exportValue**(final Object value) |
 
 ### Syntax
 

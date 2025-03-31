@@ -2,11 +2,11 @@
 
 ### Summary
 
-|                  |                                                            |
-| ---------------- | ---------------------------------------------------------- |
-| **extends**      | AbstractJobPerformable<CronJobModel>                       |
-| implements       |                                                            |
-| override methods | **perform**(final CronJobModel cronJob) <br> isAbortable() |
+|                  |                                                                          |
+| ---------------- | ------------------------------------------------------------------------ |
+| **extends**      | AbstractJobPerformable<CronJobModel>                                     |
+| implements       |                                                                          |
+| override methods | PerformResult **perform**(final CronJobModel cronJob) <br> isAbortable() |
 
 ### Example
 

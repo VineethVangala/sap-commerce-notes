@@ -2,11 +2,11 @@
 
 ### Summary
 
-|                     |                                                                                                                                        |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| extends             |                                                                                                                                        |
-| **implements**      | **ConstraintValidator<NotLoremIpsum, String>**                                                                                         |
-| **override method** | **initialize**(final NotLoremIpsum constraintAnnotation) <br>**isValid**(final String value, final ConstraintValidatorContext context) |
+|                     |                                                                                                                                                      |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| extends             |                                                                                                                                                      |
+| **implements**      | **ConstraintValidator<NotLoremIpsum, String>**                                                                                                       |
+| **override method** | void **initialize**(final NotLoremIpsum constraintAnnotation) <br> boolean **isValid**(final String value, final ConstraintValidatorContext context) |
 
 1. Create the Constraint Item Type.
 
