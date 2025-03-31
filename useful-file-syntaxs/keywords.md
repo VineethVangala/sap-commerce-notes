@@ -41,6 +41,7 @@
 | GenericItem                                | Data Modelling   |                                           |                                                                                         |
 | LinkItem                                   | Data Modelling   |                                           |                                                                                         |
 | Attribute Descriptor                       | Data Modelling   |                                           |                                                                                         |
+| Validation Constraint                      |                  |                                           |                                                                                         |
 | Workflow                                   | Workflow         |                                           |                                                                                         |
 | Workflow Template                          | Workflow         |                                           |                                                                                         |
 | Workflow Action Template                   | Workflow         |                                           |                                                                                         |
