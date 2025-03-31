@@ -54,6 +54,8 @@
 | Split                                      | Business Process |                                           |                                                                                         |
 | Notify                                     | Business Process |                                           |                                                                                         |
 | End                                        | Business Process |                                           |                                                                                         |
+| Task                                       |                  |                                           |                                                                                         |
+| Task Condition                             |                  |                                           |                                                                                         |
 | RestTemplate                               |                  |                                           |                                                                                         |
 | Gateway                                    |                  |                                           |                                                                                         |
 | OAuthClientDetails                         | Oauth 2.0        |                                           |                                                                                         |
