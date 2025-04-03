@@ -1,0 +1,16 @@
+INSERT_UPDATE SearchRestriction ; code[unique=true]               ; principal(uid) ; query                                               ; restrictedType(code) ; active ; generate
+                                ; ProductInSessionCatalogVersions ; anonymous      ; {item:catalogVersion} IN (?session.catalogversions) ; Product              ; true   ; true    
+
+INSERT_UPDATE SearchRestriction;code[unique=true];active;generate;restrictedType(code);principal(uid);query
+                               ;Backoffice_Media_Catalog; true; false; Catalog; employeegroup; "{id} not in ('_boconfig')"
+                               ;Backoffice_Media_Catalog_Version; true; false; CatalogVersion; employeegroup; "{catalog} not in ({{SELECT {pk} FROM {Catalog*} where {id}='_boconfig'}})"
+                               ;Backoffice_Configuration_Media; true; false; Media; employeegroup; "{code} not in ('cockpitng-config', 'cockpitng-widgets-config')"
+
+INSERT_UPDATE SearchRestriction;code[unique=true];name[lang=en];query;principal(UID);restrictedType(code);active;generate
+;b2busergroup_restriction;Restrict B2BUserGroup visibility;{item:Unit} IN (?session.branch) and  EXISTS ( {{ select {ug:PK} from {UserGroup as ug} where {ug:PK} IN (?session.user.groups) and {ug:uid} = 'b2badmingroup' }} );b2bgroup;B2BUserGroup;true;true
+;branch_restriction;branch_restriction;{item:pk} IN (?session.branch) and  ( {item:active} = 1 OR EXISTS ( {{ select {ug:PK} from {UserGroup as ug} where {ug:PK} IN (?session.user.groups) and {ug:uid} = 'b2badmingroup' }} ));b2bgroup;B2BUnit;true;true
+;employee_restriction;Restrict employees visibility;EXISTS ({{ SELECT {pk} FROM {PrincipalGroupRelation} WHERE {source}={item:pk} AND {target} IN ( ?session.branch ) }} ) AND ( {item:active} = 1 OR EXISTS ( {{ select {ug:PK} from {UserGroup as ug} where {ug:PK} IN (?session.user.groups) and {ug:uid} = 'b2badmingroup' }} ));b2bgroup;B2BCustomer;true;true
+;costcenter_restriction;Restrict CostCenter visibility;{item:Unit} IN (?session.branch) and  ( {item:active} = 1 OR EXISTS ( {{ select {ug:PK} from {UserGroup as ug} where {ug:PK} IN (?session.user.groups) and {ug:uid} = 'b2badmingroup' }} ));b2bgroup;B2BCostCenter;true;true
+;budget_restriction;Restrict Budget visibility;{item:Unit} IN (?session.branch) and  ( {item:active} = 1 OR EXISTS ( {{ select {ug:PK} from {UserGroup as ug} where {ug:PK} IN (?session.user.groups) and {ug:uid} = 'b2badmingroup' }} ));b2bgroup;B2BBudget;true;true
+;b2border_restriction;Restrict B2BUserGroup visibility for orders;({item:Unit} IN (?session.branch) OR ({item:Unit} is NULL AND {item:User}=?session.user));b2bgroup;Order;true;true;
+
