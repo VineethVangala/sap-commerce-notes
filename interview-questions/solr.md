@@ -2,8 +2,8 @@
 
 | Question                                               | Answer                                                                                                                                                                              |
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| What is full form of Solr?                             |                                                                                                                                                                                     |
-| What are the configuration files?                      |                                                                                                                                                                                     |
+| What is full form of Solr?                             | Search On Lucene w/ Replication                                                                                                                                                     |
+| What are the configuration files?                      | schema.xml, solrconfig.xml                                                                                                                                                          |
 | How to enable autosuggest                              |                                                                                                                                                                                     |
 | How to enable spellcheck                               |                                                                                                                                                                                     |
 | How to enable new Language?                            |                                                                                                                                                                                     |
