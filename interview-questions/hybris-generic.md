@@ -9,7 +9,7 @@
 | How build works                                           |                                                                                                                                                       |
 | What is populator?                                        |                                                                                                                                                       |
 | What is reverse populator?                                |                                                                                                                                                       |
-| Difference between converter and populator?               |                                                                                                                                                       |
+| Difference between converter and populator?               | Converters creates an object of DTO. <br> While populators breaks the code for filling up data in DTO.                                                |
 | How to create a new populator?                            |                                                                                                                                                       |
 | How to create a new reverse populator?                    |                                                                                                                                                       |
 |                                                           |                                                                                                                                                       |
@@ -38,6 +38,8 @@
 | How to add CC and BCC in an email ?                       |                                                                                                                                                       |
 | Sync vs Async APIs                                        |                                                                                                                                                       |
 |                                                           |                                                                                                                                                       |
+| What are catalog aware items?                             |                                                                                                                                                       |
+| How to configure items as catalog aware ?                 |                                                                                                                                                       |
 | How to configure attributes to be synced in Catalog sync? |                                                                                                                                                       |
 | How to configure multi-threading in Catalog sync?         |                                                                                                                                                       |
 |                                                           |                                                                                                                                                       |
@@ -49,3 +51,4 @@
 |                                                           |                                                                                                                                                       |
 | How to enable caching?                                    |                                                                                                                                                       |
 | How to set unique key for caching?                        |                                                                                                                                                       |
+| What are Filters?                                         |                                                                                                                                                       |
