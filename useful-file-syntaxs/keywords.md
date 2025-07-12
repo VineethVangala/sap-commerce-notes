@@ -135,3 +135,15 @@
 | useForSpellchecking                        | Solr             |                                               |                                                                                         |
 | useForAutocomplete                         | Solr             |                                               |                                                                                         |
 | <hr>                                       | <hr>             | <hr>                                          | <hr>                                                                                    |
+| Promotion                                  | Promotion        |                                               |                                                                                         |
+| Action                                     | Promotion        |                                               |                                                                                         |
+| Condition                                  | Promotion        |                                               |                                                                                         |
+| Rules                                      | Promotion        |                                               |                                                                                         |
+| Facts                                      | Promotion        |                                               |                                                                                         |
+| RAO                                        | Promotion        |                                               |                                                                                         |
+| Coupon                                     | Promotion        |                                               |                                                                                         |
+| Promotion Messages                         | Promotion        |                                               |                                                                                         |
+| Promotion Priority                         | Promotion        |                                               |                                                                                         |
+| Promotion Engine                           | Promotion        |                                               |                                                                                         |
+| Rules Engine                               | Promotion        |                                               |                                                                                         |
+| Drools                                     | Promotion        |                                               |                                                                                         |
