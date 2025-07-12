@@ -13,3 +13,7 @@
 | What is Cancellation and Reallocation?     |                                                                                                                                       |
 | Advanced Shipping Notice (ASN)             |                                                                                                                                       |
 | What is Availability to Promise (ATP)?     |                                                                                                                                       |
+
+> **Cart + User Details + Shipping^ + Delivery Mode + Promotions^ + payment = Order**
+>
+> ^ are optional
